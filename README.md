@@ -17,6 +17,8 @@ git push -u origin master
 
 主要步骤是
 
+git add README.md
+
 git commit -m "first commit"
 
 git push -u origin master
