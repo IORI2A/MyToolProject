@@ -24,3 +24,5 @@ git commit -m "first commit"
 git push -u origin master
 
 # 也可以直接 网页操作上传
+
+记住本地需要进行同步更新哈
