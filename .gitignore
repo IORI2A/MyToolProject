@@ -1,0 +1,17 @@
+*.tlog
+
+*.idb
+
+*.pdb
+
+*.log
+
+*.ipch
+
+*.obj
+
+*.exe
+
+*.ilk
+
+.svn
