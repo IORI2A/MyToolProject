@@ -17,3 +17,8 @@
 -- 支持ASNI\UNICODE。
 
 
+
+2019-09-28
+
+1.检测目标主机IP地址是否可通工具。
+-- 使用 windows IP Helper API 发送 ICMP 报文检测目标主机。

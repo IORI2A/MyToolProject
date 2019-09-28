@@ -54,6 +54,15 @@ public:
 	static void LOG_ENDL(const char *file, const char *str);
 	static void LOG_ENDL(const wchar_t *file, const wchar_t *str);
 
+	//
+	//private:
+	//
+	//#ifdef UNICODE
+	//	static void __LOG_STR_ENDL(const wchar_t *file, const wchar_t *str);
+	//#else
+	//	static void __LOG_STR_ENDL(const char *file, const char *str);
+	//#endif
+
 private:
 	static char m_staticCharCurrentTimeBuffer[128];
 	static wchar_t m_staticWCharCurrentTimeBuffer[128];
@@ -63,15 +72,9 @@ public:
 	static const wchar_t * GET_CURRENT_TIME(const wchar_t *format);
 	static const char * GET_LOCAL_CURRENT_TIME();
 	static const char * GET_SYSTEM_CURRENT_TIME();
-//
-//private:
-//
-//#ifdef UNICODE
-//	static void __LOG_STR_ENDL(const wchar_t *file, const wchar_t *str);
-//#else
-//	static void __LOG_STR_ENDL(const char *file, const char *str);
-//#endif
 
+public:
+	static int Ping(const wchar_t *strIP);
 };
 
 
