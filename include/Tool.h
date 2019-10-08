@@ -53,6 +53,8 @@ public:
 	static void LOG_ENDL(const wchar_t *str);
 	static void LOG_ENDL(const char *file, const char *str);
 	static void LOG_ENDL(const wchar_t *file, const wchar_t *str);
+	static void LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char * format, ...);
+	static void LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(const char *file, const char * format, ...);
 
 	//
 	//private:
@@ -75,6 +77,7 @@ public:
 
 public:
 	static int Ping(const wchar_t *strIP);
+	static int Ping(const char *strIP);
 };
 
 

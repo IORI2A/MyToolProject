@@ -1,7 +1,7 @@
 #include "../include/Tool.h"
 
 #include <fstream>
-#include <ctime>
+
 
 
 
@@ -44,6 +44,9 @@ void CTool::LOG_ENDL(const wchar_t *file, const wchar_t *str)
 {
 	m_staticMyLog.LogEndl(file, str);
 }
+
+
+#include <ctime>
 
 // const char *format : 日期格式化指示字符。参考 strftime 函数。
 //std::string CTool::GET_CURRENT_TIME(const char *format)
@@ -421,7 +424,8 @@ int CTool::Ping(const wchar_t *strIP)
 {
 	{
 		wchar_t buffer[512] = {};
-		wsprintf(buffer, L"int CTool::Ping(const wchar_t *strIP = '%s')", strIP);
+		//wsprintf(buffer, L"int CTool::Ping(const wchar_t *strIP = '%s')", strIP);
+		wsprintfW(buffer, L"int CTool::Ping(const wchar_t *strIP = '%s')", strIP);
 		CTool::LOG_ENDL(buffer);
 	}
 
@@ -430,7 +434,7 @@ int CTool::Ping(const wchar_t *strIP)
 	{
 		{
 			wchar_t buffer[512] = {};
-			wsprintf(buffer, L"无效IP strIP = 0X%08X)", strIP);
+			wsprintfW(buffer, L"无效IP strIP = 0X%08X", strIP);
 			CTool::LOG_ENDL(buffer);
 		}
 		return 0;
@@ -443,7 +447,7 @@ int CTool::Ping(const wchar_t *strIP)
 	{
 		{
 			wchar_t buffer[512] = {};
-			wsprintf(buffer, L"IP地址转换错误 ipaddr = inet_addr('%s');    ipaddr = INADDR_NONE", strIP);
+			wsprintfW(buffer, L"IP地址转换错误 ipaddr = inet_addr('%s');    ipaddr = INADDR_NONE", strIP);
 			CTool::LOG_ENDL(buffer);
 		}
 		return 0;
@@ -454,7 +458,7 @@ int CTool::Ping(const wchar_t *strIP)
 	{
 		{
 			wchar_t buffer[512] = {};
-			wsprintf(buffer, L"hIcmpFile = IcmpCreateFile();    hIcmpFile = INVALID_HANDLE_VALUE    Unable to open handle. IcmpCreatefile returned error: %ld", GetLastError());
+			wsprintfW(buffer, L"hIcmpFile = IcmpCreateFile();    hIcmpFile = INVALID_HANDLE_VALUE    Unable to open handle. IcmpCreatefile returned error: %ld", GetLastError());
 			CTool::LOG_ENDL(buffer);
 		}
 		return 0;
@@ -464,10 +468,9 @@ int CTool::Ping(const wchar_t *strIP)
 	DWORD ReplySize = sizeof(ICMP_ECHO_REPLY) + sizeof(SendData);
 	LPVOID ReplyBuffer = (VOID*) malloc(ReplySize);    // 多线程访问的时候 会出现冲突吧？
 	if (ReplyBuffer == NULL) {
-		printf("\tUnable to allocate memory\n");
 		{
 			wchar_t buffer[512] = {};
-			wsprintf(buffer, L"ReplyBuffer = (VOID*) malloc(%d);    ReplyBuffer = 0X%08X    Unable to allocate memory."
+			wsprintfW(buffer, L"ReplyBuffer = (VOID*) malloc(%d);    ReplyBuffer = 0X%08X    Unable to allocate memory."
 				, ReplySize, ReplyBuffer);
 			CTool::LOG_ENDL(buffer);
 		}
@@ -480,7 +483,7 @@ int CTool::Ping(const wchar_t *strIP)
 		NULL, ReplyBuffer, ReplySize, 1000);
 	{
 		wchar_t buffer[512] = {};
-		wsprintf(buffer, L"dwRetVal = IcmpSendEcho(hIcmpFile = 0X%08X, ipaddr = %ld, SendData = '%s', sizeof(SendData) = %d, NULL, ReplyBuffer = 0X%08X, ReplySize = %d, 1000);    dwRetVal = %d"
+		wsprintfW(buffer, L"dwRetVal = IcmpSendEcho(hIcmpFile = 0X%08X, ipaddr = %ld, SendData = '%s', sizeof(SendData) = %d, NULL, ReplyBuffer = 0X%08X, ReplySize = %d, 1000);    dwRetVal = %d"
 			, hIcmpFile, ipaddr, WCBuffer/*SendData*/, sizeof(SendData), ReplyBuffer, ReplySize, dwRetVal);
 		CTool::LOG_ENDL(buffer);
 	}
@@ -494,7 +497,7 @@ int CTool::Ping(const wchar_t *strIP)
 
 		{
 			wchar_t buffer[512] = {};
-			wsprintf(buffer, L"Received from '%s' = inet_ntoa( 0X%08X ). Status = %ld, Roundtrip time = %ld milliseconds. pEchoReply =0X%08X "
+			wsprintfW(buffer, L"Received from '%s' = inet_ntoa( 0X%08X ). Status = %ld, Roundtrip time = %ld milliseconds. pEchoReply =0X%08X "
 				, WCReplyAddrBuffer, ReplyAddr, pEchoReply->Status, pEchoReply->RoundTripTime, pEchoReply);
 			CTool::LOG_ENDL(buffer);
 		}
@@ -502,10 +505,84 @@ int CTool::Ping(const wchar_t *strIP)
 	else {
 		{
 			wchar_t buffer[512] = {};
-			wsprintf(buffer, L"Call to IcmpSendEcho failed. IcmpSendEcho returned error: %ld", GetLastError());
+			wsprintfW(buffer, L"Call to IcmpSendEcho failed. IcmpSendEcho returned error: %ld", GetLastError());
 			CTool::LOG_ENDL(buffer);
 		}
 		//return 1;
 	}
 	return dwRetVal;
+}
+
+int CTool::Ping(const char *strIP)
+{
+	CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL("int CTool::Ping(const wchar_t *strIP = '%s')", strIP);
+
+	if (!strIP)
+	{
+		CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL("无效IP strIP = 0X%08X", strIP);
+		return 0;
+	}
+
+	unsigned long ipaddr = inet_addr(strIP);
+	if (ipaddr == INADDR_NONE)
+	{
+		CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL("IP地址转换错误 ipaddr = inet_addr('%s');    ipaddr = INADDR_NONE", strIP);
+		return 0;
+	}
+
+	HANDLE hIcmpFile = IcmpCreateFile();
+	if (hIcmpFile == INVALID_HANDLE_VALUE)
+	{
+		CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL("hIcmpFile = IcmpCreateFile();    hIcmpFile = INVALID_HANDLE_VALUE    Unable to open handle. IcmpCreatefile returned error: %ld", GetLastError());
+		return 0;
+	}    
+
+	char SendData[] = "Data Buffer";
+	DWORD ReplySize = sizeof(ICMP_ECHO_REPLY) + sizeof(SendData);
+	LPVOID ReplyBuffer = (VOID*) malloc(ReplySize);    // 多线程访问的时候 会出现冲突吧？
+	if (ReplyBuffer == NULL) {
+		CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL("ReplyBuffer = (VOID*) malloc(%d);    ReplyBuffer = 0X%08X    Unable to allocate memory."
+			, ReplySize, ReplyBuffer);
+		return 0;
+	}    
+
+	DWORD dwRetVal = IcmpSendEcho(hIcmpFile, ipaddr, SendData, sizeof(SendData), 
+		NULL, ReplyBuffer, ReplySize, 1000);
+	CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL("dwRetVal = IcmpSendEcho(hIcmpFile = 0X%08X, ipaddr = %ld, SendData = '%s', sizeof(SendData) = %d, NULL, ReplyBuffer = 0X%08X, ReplySize = %d, 1000);    dwRetVal = %d"
+		, hIcmpFile, ipaddr, SendData, sizeof(SendData), ReplyBuffer, ReplySize, dwRetVal);
+	if (dwRetVal != 0) {
+		PICMP_ECHO_REPLY pEchoReply = (PICMP_ECHO_REPLY)ReplyBuffer;
+		struct in_addr ReplyAddr;
+		ReplyAddr.S_un.S_addr = pEchoReply->Address;
+		CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL("Received from '%s' = inet_ntoa( 0X%08X ). Status = %ld, Roundtrip time = %ld milliseconds. pEchoReply =0X%08X "
+			, inet_ntoa( ReplyAddr ), ReplyAddr, pEchoReply->Status, pEchoReply->RoundTripTime, pEchoReply);
+	}
+	else {
+		CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL("Call to IcmpSendEcho failed. IcmpSendEcho returned error: %ld", GetLastError());
+	}
+	return dwRetVal;
 } 
+
+
+#include <stdio.h>    // 头文件就近引用
+#include <stdarg.h>
+
+void CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char * format, ...)
+{
+	char buffer[512];
+	va_list args;
+	va_start (args, format);
+	vsprintf (buffer,format, args);
+	CTool::LOG_ENDL(buffer);
+	va_end (args);
+}
+
+void CTool::LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(const char *file, const char * format, ...)
+{
+	char buffer[512];
+	va_list args;
+	va_start (args, format);
+	vsprintf (buffer,format, args);
+	CTool::LOG_ENDL(file, buffer);
+	va_end (args);
+}
