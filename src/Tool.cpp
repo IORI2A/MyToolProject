@@ -586,3 +586,135 @@ void CTool::LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(const char *file, const char * 
 	CTool::LOG_ENDL(file, buffer);
 	va_end (args);
 }
+
+
+// RawDllMain 执行时，全局/静态对象还没有执行构造函数。因此专门设计一个函数形式的日志工具，与日志对象类同，但没有互斥锁了。
+void CTool::FUN_LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char * format, ...)
+{
+	char buffer[512];
+	va_list args;
+	va_start (args, format);
+	vsprintf (buffer,format, args);
+
+	//std::ofstream of("temp.log", std::ios_base::out | std::ios_base::app );  // 退出程序时 RawDllMain 中调用执行到此处有错误。 改为使用 C 库函数。
+	//of << CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S ");
+	//of << buffer;
+	//of << std::endl;
+	FILE *f = fopen("temp.log", "a");
+	fprintf(f, "%s%s\n", CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S "), buffer);
+	fclose(f);
+
+	va_end (args);
+}
+
+void CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(const char *file, const char * format, ...)
+{
+	char buffer[512];
+	va_list args;
+	va_start (args, format);
+	vsprintf (buffer,format, args);
+
+	//std::ofstream of(file, std::ios_base::out | std::ios_base::app );
+	//of << CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S ");
+	//of << buffer;
+	//of << std::endl;
+	FILE *f = fopen(file, "a");
+	fprintf(f, "%s%s\n", CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S "), buffer);
+	fclose(f);
+
+	va_end (args);
+}
+
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+
+namespace Tool
+{
+	CMyAutoLogName::CMyAutoLogName(const char *file, int line, const char *func, const char *logFie)
+		: m_file(file), m_line(line), m_func(func), m_logFile(logFie)
+	{
+		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL("temp.log", "%s (%d) %s", __FILE__, __LINE__, __FUNCTION__);
+		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL("temp.log", "%s (%d) %s", __FILE__, __LINE__, __FUNCDNAME__);
+		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL("temp.log", "%s (%d) %s", __FILE__, __LINE__, __FUNCSIG__);
+		///*
+		//2019-10-11 10:31:01 e:\lz\work\doortotalcontrolv10\test\test.cpp (34) wWinMain
+		//2019-10-11 10:31:01 e:\lz\work\doortotalcontrolv10\test\test.cpp (35) _wWinMain@16
+		//2019-10-11 10:31:01 e:\lz\work\doortotalcontrolv10\test\test.cpp (36) int __stdcall wWinMain(struct HINSTANCE__ *,struct HINSTANCE__ *,wchar_t *,int)
+		//*/
+
+		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "[AutoLog] %s(%d): %s", m_file.c_str(), m_line, m_func.c_str());
+		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s(%d): %s", m_file.c_str(), m_line, m_func.c_str());
+		CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s(%d): ++++ %s", m_file.c_str(), m_line, m_func.c_str());
+	}
+
+	CMyAutoLogName::CMyAutoLogName(const char *file, const char *func, const char *logFie)
+		: m_file(file), m_line(0), m_func(func), m_logFile(logFie)
+	{
+		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "[AutoLog] %s: %s", m_file.c_str(), m_func.c_str());
+		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s: %s", m_file.c_str(), m_func.c_str());
+		CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s: ++++ %s", m_file.c_str(), m_func.c_str());
+	}
+
+
+	CMyAutoLogName::~CMyAutoLogName()
+	{
+		if (m_line)
+		{
+			//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "[~AutoLog] %s(%d): %s", m_file.c_str(), m_line, m_func.c_str());
+			//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s(%d): ~ %s", m_file.c_str(), m_line, m_func.c_str());
+			CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s(%d): ---- %s", m_file.c_str(), m_line, m_func.c_str());
+		}
+		else
+		{
+			//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "[~AutoLog] %s: %s", m_file.c_str(), m_func.c_str());
+			//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s: ~ %s", m_file.c_str(), m_func.c_str());
+			CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s: ---- %s", m_file.c_str(), m_func.c_str());
+		}
+	}
+}
+
+
+// 提供支持不带换行符的日志输出。 目前仅支持 ANSI
+void CMyLog::LogNotEndl(const char *file, const char *str)
+{
+	EnterCriticalSection(&m_criticalSection);
+
+	std::ofstream of(file, std::ios_base::out | std::ios_base::app );
+	of << CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S ");
+	of << str;
+	// 不带换行结束符。
+
+	LeaveCriticalSection(&m_criticalSection);
+}
+
+void CTool::LOG_NOT_ENDL(const char *str)    // 支持直接文本内容。 不带换行结束符。
+{
+	m_staticMyLog.LogNotEndl("temp.log", str);
+}
+
+void CTool::LOG_NOT_ENDL(const char *file, const char *str)
+{
+	m_staticMyLog.LogEndl(file, str);
+}
+
+void CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR(const char * format, ...)    // 不带换行结束符。
+{
+	char buffer[512];
+	va_list args;
+	va_start (args, format);
+	vsprintf (buffer,format, args);
+	CTool::LOG_NOT_ENDL(buffer);
+	va_end (args);
+}
+
+void CTool::LOG_TO_SPECIFIC_FILE_FORMAT_STR(const char *file, const char * format, ...)
+{
+	char buffer[512];
+	va_list args;
+	va_start (args, format);
+	vsprintf (buffer,format, args);
+	CTool::LOG_NOT_ENDL(file, buffer);
+	va_end (args);
+}
+
