@@ -420,6 +420,7 @@ void CMyLog::LogEndl(const wchar_t *file, const wchar_t *str)
 
 // 返回结果为 目标主机返回的ICMP报文数量。
 // 为 0 可视为目标主机不通 ！？
+#pragma warning(disable: 4996)
 int CTool::Ping(const wchar_t *strIP)
 {
 	{
@@ -512,6 +513,7 @@ int CTool::Ping(const wchar_t *strIP)
 	}
 	return dwRetVal;
 }
+#pragma warning(default: 4996)
 
 int CTool::Ping(const char *strIP)
 {
@@ -567,6 +569,7 @@ int CTool::Ping(const char *strIP)
 #include <stdio.h>    // 头文件就近引用
 #include <stdarg.h>
 
+#pragma warning(disable: 4996)
 void CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char * format, ...)
 {
 	char buffer[512];
@@ -624,6 +627,7 @@ void CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(const char *file, const cha
 
 	va_end (args);
 }
+#pragma warning(default: 4996)
 
 
 
@@ -698,6 +702,8 @@ void CTool::LOG_NOT_ENDL(const char *file, const char *str)
 	m_staticMyLog.LogEndl(file, str);
 }
 
+
+#pragma warning(disable: 4996)
 void CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR(const char * format, ...)    // 不带换行结束符。
 {
 	char buffer[512];
@@ -717,4 +723,31 @@ void CTool::LOG_TO_SPECIFIC_FILE_FORMAT_STR(const char *file, const char * forma
 	CTool::LOG_NOT_ENDL(file, buffer);
 	va_end (args);
 }
+#pragma warning(default: 4996)
 
+
+// 支持 UNICODE 版本
+const wchar_t * CTool::GET_W_LOCAL_CURRENT_TIME()
+{
+	SYSTEMTIME st;
+	// 本地时间 LocalTime 本地时间会根据机器设置的时区，将系统时间进行调整以适合本地时区。
+	GetLocalTime(&st);
+	swprintf_s(m_staticWCharCurrentTimeBuffer, L"%04d-%02d-%02d %02d:%02d:%02d.%03d ", 
+		st.wYear, st.wMonth, st.wDay, 
+		st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+
+	return m_staticWCharCurrentTimeBuffer;
+}
+
+const wchar_t * CTool::GET_W_SYSTEM_CURRENT_TIME()
+{
+	/////////////////////// 获取系统时间 ///////////////////////
+	// 系统时间 SystemTime UTC
+	SYSTEMTIME st;
+	GetSystemTime(&st);
+	swprintf_s(m_staticWCharCurrentTimeBuffer, L"%04d-%02d-%02d %02d:%02d:%02d.%03d ", 
+		st.wYear, st.wMonth, st.wDay, 
+		st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
+
+	return m_staticWCharCurrentTimeBuffer;
+}

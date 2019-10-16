@@ -84,6 +84,9 @@ public:
 	static const wchar_t * GET_CURRENT_TIME(const wchar_t *format);
 	static const char * GET_LOCAL_CURRENT_TIME();
 	static const char * GET_SYSTEM_CURRENT_TIME();
+	// 获取时间函数 增加支持 UNICODE 版本
+	static const wchar_t * GET_W_LOCAL_CURRENT_TIME();
+	static const wchar_t * GET_W_SYSTEM_CURRENT_TIME();
 
 public:
 	static int Ping(const wchar_t *strIP);

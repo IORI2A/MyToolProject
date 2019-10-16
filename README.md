@@ -52,4 +52,6 @@
 
 1.GET_LOCAL_CURRENT_TIME() 和 GET_SYSTEM_CURRENT_TIME() 格式化输出指定占符宽度。
 2.修改 GET_CURRENT_TIME(const wchar_t *format) 应当使用 format 参数控制格式化输出。
+3.获取时间函数 增加支持 UNICODE 版本。
+4. warning C4996 提示不安全函数。
 
