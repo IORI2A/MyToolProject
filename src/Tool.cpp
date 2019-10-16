@@ -88,7 +88,7 @@ const wchar_t * CTool::GET_CURRENT_TIME(const wchar_t *format)
 		swprintf_s(m_staticWCharCurrentTimeBuffer, 128, L"1900-01-01 00:00:00 ");
 	}
 
-	wcsftime(m_staticWCharCurrentTimeBuffer, 128, L"%Y-%m-%d %H:%M:%S ", &today );
+	wcsftime(m_staticWCharCurrentTimeBuffer, 128, /*L"%Y-%m-%d %H:%M:%S "*/format, &today );
 
 	return m_staticWCharCurrentTimeBuffer;
 }
@@ -98,7 +98,7 @@ const char * CTool::GET_LOCAL_CURRENT_TIME()
 	SYSTEMTIME st;
 	// 本地时间 LocalTime 本地时间会根据机器设置的时区，将系统时间进行调整以适合本地时区。
 	GetLocalTime(&st);
-	sprintf(m_staticCharCurrentTimeBuffer, "%d-%d-%d %d:%d:%d.%d ", 
+	sprintf(m_staticCharCurrentTimeBuffer, "%04d-%02d-%02d %02d:%02d:%02d.%03d ", 
 		st.wYear, st.wMonth, st.wDay, 
 		st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
 
@@ -111,7 +111,7 @@ const char * CTool::GET_SYSTEM_CURRENT_TIME()
 	// 系统时间 SystemTime UTC
 	SYSTEMTIME st;
 	GetSystemTime(&st);
-	sprintf(m_staticCharCurrentTimeBuffer, "%d-%d-%d %d:%d:%d.%d ", 
+	sprintf(m_staticCharCurrentTimeBuffer, "%04d-%02d-%02d %02d:%02d:%02d.%03d ", 
 		st.wYear, st.wMonth, st.wDay, 
 		st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
 

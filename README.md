@@ -47,3 +47,9 @@
 -- 实际使用未达预期，多了日期内容输出。暂不使用。
 
 
+
+2019-10-16
+
+1.GET_LOCAL_CURRENT_TIME() 和 GET_SYSTEM_CURRENT_TIME() 格式化输出指定占符宽度。
+2.修改 GET_CURRENT_TIME(const wchar_t *format) 应当使用 format 参数控制格式化输出。
+
