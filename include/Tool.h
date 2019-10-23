@@ -3,11 +3,23 @@
 
 #pragma once
 
-#ifndef _AFXDLL
+#ifdef _WINDOWS //;_USRDLL // WIN32程序使用
 #include <windows.h>
-#else
-//#include "afxwin.h"
-#endif
+#else // _WINDOWS
+
+#ifdef _LIB // 静态库使用
+#include <windows.h>
+#else // _LIB
+
+#ifndef _AFXDLL // 其它情况
+#include <windows.h>
+#else // _AFXDLL // DLL动态库使用
+#include "afxwin.h"
+#endif // _AFXDLL
+
+#endif // _LIB
+
+#endif // _WINDOWS
 
 
 //#include <string>
@@ -18,7 +30,8 @@ class CMyLog
 {
 	friend class CTool;
 private:
-	CRITICAL_SECTION m_criticalSection;
+	CRITICAL_SECTION m_myLogCriticalSection;
+	//bool m_bLogCriticalSectionInited;
 
 //public:
 	CMyLog(void);
@@ -96,10 +109,18 @@ public:
 	// RawDllMain 执行时，全局/静态对象还没有执行构造函数。因此专门设计一个函数形式的日志工具，与日志对象类同，但没有互斥锁了。
 	static void FUN_LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char * format, ...);
 	static void FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(const char *file, const char * format, ...);
+
+private:
+	// 为 FUN_LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL 、 FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL 增加互斥锁
+	static CRITICAL_SECTION m_toolFunLogCriticalSection;
+	static bool m_bToolFunLogCriticalSectionInited;
+public:
+	static void INIT_FUN_LOG_CRITICAL_SECTION();
+	static void DELE_FUN_LOG_CRITICAL_SECTION();
 };
 
 
-#include <string>
+//#include <string>    // 为适配调测 atlmfc 变更使用 C 运行时库内容。引用c++标准库报错。
 namespace Tool // namespace Tool
 {
 	// 增加一个方便记录执行函数信息的日志工具。 
@@ -111,10 +132,14 @@ namespace Tool // namespace Tool
 		~CMyAutoLogName();
 
 	private:
-		std::string m_file;
+		//std::string m_file;
+		//int m_line;
+		//std::string m_func;
+		//std::string m_logFile;
+		char * m_pFile;
 		int m_line;
-		std::string m_func;
-		std::string m_logFile;
+		char * m_pFunc;
+		char * m_pLogFile;
 	};
 } // namespace Tool
 

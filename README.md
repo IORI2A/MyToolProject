@@ -55,3 +55,10 @@
 3.获取时间函数 增加支持 UNICODE 版本。
 4. warning C4996 提示不安全函数。
 
+
+
+2019-10-22
+
+1.为适配调测 atlmfc 变更使用 C 运行时库内容。引用c++标准库报错。
+2.修改日志工具 LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL 输出仅时间BUG。
+3.为 FUN_LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL 、 FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL 增加互斥锁。

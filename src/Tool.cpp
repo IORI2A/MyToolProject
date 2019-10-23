@@ -1,6 +1,7 @@
 #include "../include/Tool.h"
 
-#include <fstream>
+//#include <fstream>
+#include <stdio.h>
 
 
 
@@ -131,14 +132,19 @@ const char * CTool::GET_SYSTEM_CURRENT_TIME()
 //////////////////////////////////////////////////////////////////////////////////////////////////////
 
 CMyLog::CMyLog(void)
+	//: m_bLogCriticalSectionInited(false)
 {
-	InitializeCriticalSection(&m_criticalSection);
+	//if (!m_bLogCriticalSectionInited)
+	//{
+		InitializeCriticalSection(&m_myLogCriticalSection);
+	//	m_bLogCriticalSectionInited = true;
+	//}
 }
 
 
 CMyLog::~CMyLog(void)
 {
-	DeleteCriticalSection(&m_criticalSection);
+	DeleteCriticalSection(&m_myLogCriticalSection);
 }
 
 
@@ -146,7 +152,7 @@ CMyLog::~CMyLog(void)
 //{
 //	//#ifdef _DEBUG
 //
-//	//EnterCriticalSection(&m_criticalSection);
+//	//EnterCriticalSection(&m_myLogCriticalSection);
 //
 //	//std::ofstream of(TEXT("\\NandFlash\\test.txt"), std::ios_base::out | std::ios_base::app );
 //	//of << CTime::GetCurrentTime().Format("%Y-%m-%d %H:%M:%S ").GetString();
@@ -154,41 +160,65 @@ CMyLog::~CMyLog(void)
 //	//of << std::endl;
 //	__LogStrEndl("test.txt", str);
 //
-//	//LeaveCriticalSection(&m_criticalSection);
+//	//LeaveCriticalSection(&m_myLogCriticalSection);
 //
 //	//#endif
 //}
 
 // const char *file : 文件名。 须有NULL结束符。
 // const char *str : 日志信息。 须有NULL结束符。
+#pragma warning(disable: 4996)
+//void CMyLog::LogEndl(const char *file, const char *str)
+//{
+//	EnterCriticalSection(&m_myLogCriticalSection);
+//
+//	std::ofstream of(file, std::ios_base::out | std::ios_base::app );
+//	//of << CTime::GetCurrentTime().Format("%Y-%m-%d %H:%M:%S ").GetString();
+//	of << CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S ");
+//	of << str;
+//	of << std::endl;
+//
+//	//__LogStrEndl(file, str);
+//
+//	LeaveCriticalSection(&m_myLogCriticalSection);
+//}
+
 void CMyLog::LogEndl(const char *file, const char *str)
 {
-	EnterCriticalSection(&m_criticalSection);
+	EnterCriticalSection(&m_myLogCriticalSection);
 
-	std::ofstream of(file, std::ios_base::out | std::ios_base::app );
-	//of << CTime::GetCurrentTime().Format("%Y-%m-%d %H:%M:%S ").GetString();
-	of << CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S ");
-	of << str;
-	of << std::endl;
+	FILE *f = fopen(file, "a");
+	fprintf(f, "%s%s\n", CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S "), str);
+	fclose(f);
 
-	//__LogStrEndl(file, str);
-
-	LeaveCriticalSection(&m_criticalSection);
+	LeaveCriticalSection(&m_myLogCriticalSection);
 }
+
+//void CMyLog::LogEndl(const wchar_t *file, const wchar_t *str)
+//{
+//	//__LogStrEndl(file, str);
+//
+//	EnterCriticalSection(&m_myLogCriticalSection);
+//
+//	std::wofstream of(file, std::ios_base::out | std::ios_base::app );
+//	of << CTool::GET_CURRENT_TIME(L"%Y-%m-%d %H:%M:%S ");
+//	of << str;
+//	of << std::endl;
+//
+//	LeaveCriticalSection(&m_myLogCriticalSection);
+//}
 
 void CMyLog::LogEndl(const wchar_t *file, const wchar_t *str)
 {
-	//__LogStrEndl(file, str);
+	EnterCriticalSection(&m_myLogCriticalSection);
 
-	EnterCriticalSection(&m_criticalSection);
+	FILE *f = _wfopen(file, L"a");
+	fwprintf(f, L"%s%s\n", CTool::GET_CURRENT_TIME(L"%Y-%m-%d %H:%M:%S "), str);
+	fclose(f);
 
-	std::wofstream of(file, std::ios_base::out | std::ios_base::app );
-	of << CTool::GET_CURRENT_TIME(L"%Y-%m-%d %H:%M:%S ");
-	of << str;
-	of << std::endl;
-
-	LeaveCriticalSection(&m_criticalSection);
+	LeaveCriticalSection(&m_myLogCriticalSection);
 }
+#pragma warning(default: 4996)
 
 //// const char *file : 文件名。 须有NULL结束符。
 //// const char *str : 日志信息。 须有NULL结束符。
@@ -198,7 +228,7 @@ void CMyLog::LogEndl(const wchar_t *file, const wchar_t *str)
 //	void CMyLog::__LogStrEndl(const char *file, const char *str)
 //#endif
 //{
-//	EnterCriticalSection(&m_criticalSection);
+//	EnterCriticalSection(&m_myLogCriticalSection);
 //
 //#ifdef UNICODE
 //	std::wofstream of(file, std::ios_base::out | std::ios_base::app );
@@ -211,7 +241,7 @@ void CMyLog::LogEndl(const wchar_t *file, const wchar_t *str)
 //	of << str;
 //	of << std::endl;
 //
-//	LeaveCriticalSection(&m_criticalSection);
+//	LeaveCriticalSection(&m_myLogCriticalSection);
 //}
 
 //// const char *file : 文件名。 须有NULL结束符。
@@ -222,7 +252,7 @@ void CMyLog::LogEndl(const wchar_t *file, const wchar_t *str)
 //void CMyLog::__LogStrEndl(const char *file, const char *str)
 //#endif
 //{
-//	EnterCriticalSection(&m_criticalSection);
+//	EnterCriticalSection(&m_myLogCriticalSection);
 //
 //#ifdef UNICODE
 //	std::wofstream of(file, std::ios_base::out | std::ios_base::app );
@@ -235,33 +265,33 @@ void CMyLog::LogEndl(const wchar_t *file, const wchar_t *str)
 //	of << str;
 //	of << std::endl;
 //
-//	LeaveCriticalSection(&m_criticalSection);
+//	LeaveCriticalSection(&m_myLogCriticalSection);
 //}
 
 //// const char *file : 文件名。 须有NULL结束符。
 //// const char *str : 日志信息。 须有NULL结束符。
 //void CMyLog::__LogStrEndl(const char *file, const char *str)
 //{
-//	EnterCriticalSection(&m_criticalSection);
+//	EnterCriticalSection(&m_myLogCriticalSection);
 //
 //	std::ofstream of(file, std::ios_base::out | std::ios_base::app );
 //	of << CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S ");
 //	of << str;
 //	of << std::endl;
 //
-//	LeaveCriticalSection(&m_criticalSection);
+//	LeaveCriticalSection(&m_myLogCriticalSection);
 //}
 //
 //void CMyLog::__LogStrEndl(const wchar_t *file, const wchar_t *str)
 //{
-//	EnterCriticalSection(&m_criticalSection);
+//	EnterCriticalSection(&m_myLogCriticalSection);
 //
 //	std::wofstream of(file, std::ios_base::out | std::ios_base::app );
 //	of << CTool::GET_CURRENT_TIME(L"%Y-%m-%d %H:%M:%S ");
 //	of << str;
 //	of << std::endl;
 //
-//	LeaveCriticalSection(&m_criticalSection);
+//	LeaveCriticalSection(&m_myLogCriticalSection);
 //}
 
 
@@ -572,7 +602,7 @@ int CTool::Ping(const char *strIP)
 #pragma warning(disable: 4996)
 void CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char * format, ...)
 {
-	char buffer[512];
+	char buffer[512] = {};
 	va_list args;
 	va_start (args, format);
 	vsprintf (buffer,format, args);
@@ -582,7 +612,7 @@ void CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char * format, ...)
 
 void CTool::LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(const char *file, const char * format, ...)
 {
-	char buffer[512];
+	char buffer[512] = {};
 	va_list args;
 	va_start (args, format);
 	vsprintf (buffer,format, args);
@@ -594,7 +624,12 @@ void CTool::LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(const char *file, const char * 
 // RawDllMain 执行时，全局/静态对象还没有执行构造函数。因此专门设计一个函数形式的日志工具，与日志对象类同，但没有互斥锁了。
 void CTool::FUN_LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char * format, ...)
 {
-	char buffer[512];
+	if (m_bToolFunLogCriticalSectionInited)
+	{
+		EnterCriticalSection(&m_toolFunLogCriticalSection);
+	}
+
+	char buffer[512] = {};
 	va_list args;
 	va_start (args, format);
 	vsprintf (buffer,format, args);
@@ -608,11 +643,21 @@ void CTool::FUN_LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char * format, ...)
 	fclose(f);
 
 	va_end (args);
+
+	if (m_bToolFunLogCriticalSectionInited)
+	{
+		LeaveCriticalSection(&m_toolFunLogCriticalSection);
+	}
 }
 
 void CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(const char *file, const char * format, ...)
 {
-	char buffer[512];
+	if (m_bToolFunLogCriticalSectionInited)
+	{
+		EnterCriticalSection(&m_toolFunLogCriticalSection);
+	}
+
+	char buffer[512] = {};
 	va_list args;
 	va_start (args, format);
 	vsprintf (buffer,format, args);
@@ -626,6 +671,11 @@ void CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(const char *file, const cha
 	fclose(f);
 
 	va_end (args);
+
+	if (m_bToolFunLogCriticalSectionInited)
+	{
+		LeaveCriticalSection(&m_toolFunLogCriticalSection);
+	}
 }
 #pragma warning(default: 4996)
 
@@ -635,62 +685,123 @@ void CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(const char *file, const cha
 
 namespace Tool
 {
-	CMyAutoLogName::CMyAutoLogName(const char *file, int line, const char *func, const char *logFie)
-		: m_file(file), m_line(line), m_func(func), m_logFile(logFie)
-	{
-		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL("temp.log", "%s (%d) %s", __FILE__, __LINE__, __FUNCTION__);
-		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL("temp.log", "%s (%d) %s", __FILE__, __LINE__, __FUNCDNAME__);
-		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL("temp.log", "%s (%d) %s", __FILE__, __LINE__, __FUNCSIG__);
-		///*
-		//2019-10-11 10:31:01 e:\lz\work\doortotalcontrolv10\test\test.cpp (34) wWinMain
-		//2019-10-11 10:31:01 e:\lz\work\doortotalcontrolv10\test\test.cpp (35) _wWinMain@16
-		//2019-10-11 10:31:01 e:\lz\work\doortotalcontrolv10\test\test.cpp (36) int __stdcall wWinMain(struct HINSTANCE__ *,struct HINSTANCE__ *,wchar_t *,int)
-		//*/
+#pragma warning(disable: 4996)
+	//CMyAutoLogName::CMyAutoLogName(const char *file, int line, const char *func, const char *logFie)
+	//	: m_file(file), m_line(line), m_func(func), m_logFile(logFie)
+	//{
+	//	//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL("temp.log", "%s (%d) %s", __FILE__, __LINE__, __FUNCTION__);
+	//	//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL("temp.log", "%s (%d) %s", __FILE__, __LINE__, __FUNCDNAME__);
+	//	//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL("temp.log", "%s (%d) %s", __FILE__, __LINE__, __FUNCSIG__);
+	//	///*
+	//	//2019-10-11 10:31:01 e:\lz\work\doortotalcontrolv10\test\test.cpp (34) wWinMain
+	//	//2019-10-11 10:31:01 e:\lz\work\doortotalcontrolv10\test\test.cpp (35) _wWinMain@16
+	//	//2019-10-11 10:31:01 e:\lz\work\doortotalcontrolv10\test\test.cpp (36) int __stdcall wWinMain(struct HINSTANCE__ *,struct HINSTANCE__ *,wchar_t *,int)
+	//	//*/
 
-		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "[AutoLog] %s(%d): %s", m_file.c_str(), m_line, m_func.c_str());
-		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s(%d): %s", m_file.c_str(), m_line, m_func.c_str());
-		CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s(%d): ++++ %s", m_file.c_str(), m_line, m_func.c_str());
+	//	//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "[AutoLog] %s(%d): %s", m_file.c_str(), m_line, m_func.c_str());
+	//	//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s(%d): %s", m_file.c_str(), m_line, m_func.c_str());
+	//	CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s(%d): ++++ %s", m_file.c_str(), m_line, m_func.c_str());
+	//}
+
+	CMyAutoLogName::CMyAutoLogName(const char *file, int line, const char *func, const char *logFie)
+		: m_pFile(NULL), m_line(line), m_pFunc(NULL), m_pLogFile(NULL)
+	{
+		m_pFile = new char[128]();
+		m_pFunc = new char[128]();
+		m_pLogFile = new char[128]();
+
+		strcpy(m_pFile, file);
+		strcpy(m_pFunc, func);
+		strcpy(m_pLogFile, logFie);
+
+		CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ++++ %s", m_pFile, m_line, m_pFunc);
 	}
+
+	//CMyAutoLogName::CMyAutoLogName(const char *file, const char *func, const char *logFie)
+	//	: m_file(file), m_line(0), m_func(func), m_logFile(logFie)
+	//{
+	//	//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "[AutoLog] %s: %s", m_file.c_str(), m_func.c_str());
+	//	//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s: %s", m_file.c_str(), m_func.c_str());
+	//	CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s: ++++ %s", m_file.c_str(), m_func.c_str());
+	//}
 
 	CMyAutoLogName::CMyAutoLogName(const char *file, const char *func, const char *logFie)
-		: m_file(file), m_line(0), m_func(func), m_logFile(logFie)
+		: m_pFile(NULL), m_line(0), m_pFunc(NULL), m_pLogFile(NULL)
 	{
-		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "[AutoLog] %s: %s", m_file.c_str(), m_func.c_str());
-		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s: %s", m_file.c_str(), m_func.c_str());
-		CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s: ++++ %s", m_file.c_str(), m_func.c_str());
-	}
+		m_pFile = new char[128]();
+		//m_pFunc = new char[128](); 出现函数名过长时，空间不够用
+		m_pFunc = new char[512]();
+		m_pLogFile = new char[128]();
 
+		strcpy(m_pFile, file);
+		strcpy(m_pFunc, func);
+		strcpy(m_pLogFile, logFie);
+
+		CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ++++ %s", m_pFile, m_pFunc);
+	}
+#pragma warning(default: 4996)
+
+
+	//CMyAutoLogName::~CMyAutoLogName()
+	//{
+	//	if (m_line)
+	//	{
+	//		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "[~AutoLog] %s(%d): %s", m_file.c_str(), m_line, m_func.c_str());
+	//		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s(%d): ~ %s", m_file.c_str(), m_line, m_func.c_str());
+	//		CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s(%d): ---- %s", m_file.c_str(), m_line, m_func.c_str());
+	//	}
+	//	else
+	//	{
+	//		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "[~AutoLog] %s: %s", m_file.c_str(), m_func.c_str());
+	//		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s: ~ %s", m_file.c_str(), m_func.c_str());
+	//		CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s: ---- %s", m_file.c_str(), m_func.c_str());
+	//	}
+	//}
 
 	CMyAutoLogName::~CMyAutoLogName()
 	{
 		if (m_line)
 		{
-			//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "[~AutoLog] %s(%d): %s", m_file.c_str(), m_line, m_func.c_str());
-			//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s(%d): ~ %s", m_file.c_str(), m_line, m_func.c_str());
-			CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s(%d): ---- %s", m_file.c_str(), m_line, m_func.c_str());
+			CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s", m_pFile, m_line, m_pFunc);
 		}
 		else
 		{
-			//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "[~AutoLog] %s: %s", m_file.c_str(), m_func.c_str());
-			//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s: ~ %s", m_file.c_str(), m_func.c_str());
-			CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s: ---- %s", m_file.c_str(), m_func.c_str());
+			CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s", m_pFile, m_pFunc);
 		}
+
+		delete [] m_pFile;
+		delete [] m_pFunc;
+		delete [] m_pLogFile;
 	}
 }
 
 
 // 提供支持不带换行符的日志输出。 目前仅支持 ANSI
+//void CMyLog::LogNotEndl(const char *file, const char *str)
+//{
+//	EnterCriticalSection(&m_myLogCriticalSection);
+//
+//	std::ofstream of(file, std::ios_base::out | std::ios_base::app );
+//	of << CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S ");
+//	of << str;
+//	// 不带换行结束符。
+//
+//	LeaveCriticalSection(&m_myLogCriticalSection);
+//}
+
+#pragma warning(disable: 4996)
 void CMyLog::LogNotEndl(const char *file, const char *str)
 {
-	EnterCriticalSection(&m_criticalSection);
+	EnterCriticalSection(&m_myLogCriticalSection);
 
-	std::ofstream of(file, std::ios_base::out | std::ios_base::app );
-	of << CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S ");
-	of << str;
+	FILE *f = fopen(file, "a");
+	fprintf(f, "%s%s\n", CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S "), str);
+	fclose(f);
 	// 不带换行结束符。
 
-	LeaveCriticalSection(&m_criticalSection);
+	LeaveCriticalSection(&m_myLogCriticalSection);
 }
+#pragma warning(default: 4996)
 
 void CTool::LOG_NOT_ENDL(const char *str)    // 支持直接文本内容。 不带换行结束符。
 {
@@ -750,4 +861,25 @@ const wchar_t * CTool::GET_W_SYSTEM_CURRENT_TIME()
 		st.wHour, st.wMinute, st.wSecond, st.wMilliseconds);
 
 	return m_staticWCharCurrentTimeBuffer;
+}
+
+
+CRITICAL_SECTION CTool::m_toolFunLogCriticalSection;
+bool CTool::m_bToolFunLogCriticalSectionInited = false;
+void CTool::INIT_FUN_LOG_CRITICAL_SECTION()
+{
+	if (!m_bToolFunLogCriticalSectionInited)
+	{
+		InitializeCriticalSection(&m_toolFunLogCriticalSection);
+		m_bToolFunLogCriticalSectionInited = true;
+	}
+}
+
+void CTool::DELE_FUN_LOG_CRITICAL_SECTION()
+{
+	if (m_bToolFunLogCriticalSectionInited)
+	{
+		InitializeCriticalSection(&m_toolFunLogCriticalSection);
+		m_bToolFunLogCriticalSectionInited = false;
+	}
 }
