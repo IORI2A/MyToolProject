@@ -62,3 +62,12 @@
 1.为适配调测 atlmfc 变更使用 C 运行时库内容。引用c++标准库报错。
 2.修改日志工具 LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL 输出仅时间BUG。
 3.为 FUN_LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL 、 FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL 增加互斥锁。
+
+
+
+2019-10-25
+
+1.增加记录 CMyAutoLogName 对象生命期，即函数调用时长，转换为时钟数及分钟数显示。
+2.wsprintf 不支持%f，即不支持浮点数，双精度数格式化。可使用 swprintf 替代， swprintf 多一个长度参数
+-- _stprintf 根据宽窄字符被定义为  sprintf / swprintf 
+

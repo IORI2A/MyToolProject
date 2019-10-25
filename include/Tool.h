@@ -121,6 +121,7 @@ public:
 
 
 //#include <string>    // 为适配调测 atlmfc 变更使用 C 运行时库内容。引用c++标准库报错。
+#include <time.h> 
 namespace Tool // namespace Tool
 {
 	// 增加一个方便记录执行函数信息的日志工具。 
@@ -140,6 +141,10 @@ namespace Tool // namespace Tool
 		int m_line;
 		char * m_pFunc;
 		char * m_pLogFile;
+
+		// 记录对象生命期 （ 转换为时钟数及分钟数 ）
+		clock_t m_startClock;
+		clock_t m_finishClock;
 	};
 } // namespace Tool
 

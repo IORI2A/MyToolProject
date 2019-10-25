@@ -705,7 +705,10 @@ namespace Tool
 
 	CMyAutoLogName::CMyAutoLogName(const char *file, int line, const char *func, const char *logFie)
 		: m_pFile(NULL), m_line(line), m_pFunc(NULL), m_pLogFile(NULL)
+		  , m_startClock(0), m_finishClock(0)
 	{
+		m_startClock = clock();  // 记录开始时的时钟
+
 		m_pFile = new char[128]();
 		m_pFunc = new char[128]();
 		m_pLogFile = new char[128]();
@@ -727,7 +730,10 @@ namespace Tool
 
 	CMyAutoLogName::CMyAutoLogName(const char *file, const char *func, const char *logFie)
 		: m_pFile(NULL), m_line(0), m_pFunc(NULL), m_pLogFile(NULL)
+		  , m_startClock(0), m_finishClock(0)
 	{
+		m_startClock = clock();  // 记录开始时的时钟
+
 		m_pFile = new char[128]();
 		//m_pFunc = new char[128](); 出现函数名过长时，空间不够用
 		m_pFunc = new char[512]();
@@ -760,13 +766,19 @@ namespace Tool
 
 	CMyAutoLogName::~CMyAutoLogName()
 	{
+		m_finishClock = clock();  // 记录释放时的时钟
+		clock_t durationTick = m_finishClock - m_startClock; // 对象生命期 时钟数
+		double durationSec = (double)(m_finishClock - m_startClock) / CLOCKS_PER_SEC; // 对象生命期 秒数
+
 		if (m_line)
 		{
-			CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s", m_pFile, m_line, m_pFunc);
+			CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s [%d clock ticks, %2.1f seconds]"
+				, m_pFile, m_line, m_pFunc, durationTick, durationSec);
 		}
 		else
 		{
-			CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s", m_pFile, m_pFunc);
+			CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s [%d clock ticks, %2.1f seconds]"
+				, m_pFile, m_pFunc, durationTick, durationSec);
 		}
 
 		delete [] m_pFile;
@@ -883,3 +895,13 @@ void CTool::DELE_FUN_LOG_CRITICAL_SECTION()
 		m_bToolFunLogCriticalSectionInited = false;
 	}
 }
+
+
+// 注：
+// wsprintf 不支持%f，即不支持浮点数，双精度数格式化。
+// 可使用 swprintf 替代， swprintf 多一个长度参数，且 swprintf 没有安全函数 "_s"
+//wsprintf(buffer,  TEXT("%s 连接设备完成，返回 BOOL res = %d ！ [%d clock ticks, %d seconds]\r\n")
+//	, CTool::GET_W_LOCAL_CURRENT_TIME(), res, durationTick, durationSec);
+//swprintf(buffer, sizeof(buffer)/sizeof(wchar_t),  TEXT("%s 连接设备完成，返回 BOOL res = %d ！ [%d clock ticks, %f seconds]\r\n")
+//  , CTool::GET_W_LOCAL_CURRENT_TIME(), res, durationTick, durationSec);
+//_stprintf 根据宽窄字符被定义为  sprintf / swprintf 
