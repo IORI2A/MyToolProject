@@ -71,3 +71,20 @@
 2.wsprintf 不支持%f，即不支持浮点数，双精度数格式化。可使用 swprintf 替代， swprintf 多一个长度参数
 -- _stprintf 根据宽窄字符被定义为  sprintf / swprintf 
 
+
+
+2019-10-28
+
+1.增加一个 Projects 目录来保存完整的小型工程。
+2.增加一个截屏的工程项目 GDI_CapturingAnImage ， BITMAP 位图操作。
+-- captures an image of the entire desktop, scales it down to the current window size and then saves it to a file.
+-- 全屏截取，并缩放到当前显示窗口大小，同时保存为BMP文件。
+
+
+
+
+
+
+
+
+
