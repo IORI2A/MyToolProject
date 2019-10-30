@@ -1,8 +1,8 @@
 2019-10-30
 
 1. 增加调测函数调用堆栈的工程项目 StackWalker 。
--- 可用于集成到程序中，获取函数的堆栈便于调测程序。
--- 扩展 StackWalker 生成子类，使用 CTool 的日志功能，将函数调用堆栈信息也输出到日志文件。
+  -- 可用于集成到程序中，获取函数的堆栈便于调测程序。
+  -- 扩展 StackWalker 生成子类，使用 CTool 的日志功能，将函数调用堆栈信息也输出到日志文件。
 2. 修正 void CMyLog::LogNotEndl(const char *file, const char *str) 输出有换行符问题。
 3. Readme.md倒序记录。
 
@@ -12,8 +12,8 @@
 
 1. 增加一个 Projects 目录来保存完整的小型工程。
 2. 增加一个截屏的工程项目 GDI_CapturingAnImage ， BITMAP 位图操作。
--- captures an image of the entire desktop, scales it down to the current window size and then saves it to a file.
--- 全屏截取，并缩放到当前显示窗口大小，同时保存为BMP文件。
+  -- captures an image of the entire desktop, scales it down to the current window size and then saves it to a file.
+  -- 全屏截取，并缩放到当前显示窗口大小，同时保存为BMP文件。
 
 
 
