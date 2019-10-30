@@ -807,7 +807,7 @@ void CMyLog::LogNotEndl(const char *file, const char *str)
 	EnterCriticalSection(&m_myLogCriticalSection);
 
 	FILE *f = fopen(file, "a");
-	fprintf(f, "%s%s\n", CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S "), str);
+	fprintf(f, "%s%s", CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S "), str);
 	fclose(f);
 	// 不带换行结束符。
 
