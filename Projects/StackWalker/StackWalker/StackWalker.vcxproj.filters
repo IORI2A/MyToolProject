@@ -24,12 +24,18 @@
     <ClCompile Include="..\..\..\src\Tool.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
+    <ClCompile Include="LogStackWalker.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="StackWalker.h">
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="..\..\..\include\Tool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="LogStackWalker.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

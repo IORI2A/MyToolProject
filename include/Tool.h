@@ -23,6 +23,7 @@
 
 
 //#include <string>
+#include <cstdio>    // 使用文件描述符
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -41,7 +42,10 @@ private:
 	void LogEndl(const char *file, const char *str);
 	void LogEndl(const wchar_t *file, const wchar_t *str);
 
-	void LogNotEndl(const char *file, const char *str);    // 不带换行结束符。
+	// 增加是否需要 输出日期时间。默认参数都是放后面。
+	void LogNotEndl(const char *file, const char *str, bool bOutputDateTime = true);    // 不带换行结束符。
+	// 日志工具 提供支持文件符的函数方法接口。
+	void LogNotEndl(FILE *file, const char *str, bool bOutputDateTime = true);
 
 //private:
 
@@ -75,7 +79,9 @@ public:
 	static void LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char * format, ...);    // 支持格式化文本。 带换行结束符。
 	static void LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(const char *file, const char * format, ...);
 	static void LOG_NOT_ENDL(const char *str);    // 支持直接文本内容。 不带换行结束符。
-	static void LOG_NOT_ENDL(const char *file, const char *str);
+	static void LOG_NOT_ENDL(const char *file, const char *str, bool bOutputDateTime = true);
+	// 日志工具 提供支持文件符的函数方法接口。
+	static void LOG_NOT_ENDL(FILE *file, const char *str);
 	static void LOG_TO_DEFAULT_FILE_FORMAT_STR(const char * format, ...);    // 不带换行结束符。
 	static void LOG_TO_SPECIFIC_FILE_FORMAT_STR(const char *file, const char * format, ...);
 
@@ -117,9 +123,14 @@ private:
 public:
 	static void INIT_FUN_LOG_CRITICAL_SECTION();
 	static void DELE_FUN_LOG_CRITICAL_SECTION();
+
+public:
+	// 与 FUN_LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL 、 FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL 对应的不带换行结束符
+	static void FUN_LOG_TO_DEFAULT_FILE_FORMAT_STR(const char * format, ...);
+	static void FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR(const char *file, const char * format, ...);
 };
 
-
+//////////////////////////////////////////////////////////////////////////////////////////////////////
 //#include <string>    // 为适配调测 atlmfc 变更使用 C 运行时库内容。引用c++标准库报错。
 #include <time.h> 
 namespace Tool // namespace Tool
@@ -137,7 +148,7 @@ namespace Tool // namespace Tool
 		//int m_line;
 		//std::string m_func;
 		//std::string m_logFile;
-		char * m_pFile;
+		char * m_pFuncFileName;
 		int m_line;
 		char * m_pFunc;
 		char * m_pLogFile;
@@ -152,6 +163,51 @@ namespace Tool // namespace Tool
 //#define TOOL_AUTO_LOG_FUNCTION_INFO() Tool::CMyAutoLogName __myAutoLog(__FILE__, __FUNCTION__, "temp.log")
 #define TOOL_AUTO_LOG_FUNCTION_INFO() Tool::CMyAutoLogName __myAutoLog(__FILE__, __FUNCSIG__, "temp.log")
 
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+#include "LogStackWalker.h"
+#define TOOL_LOG_STACK_WALKER() { CLogStackWalker __myStackWalkerToLog; __myStackWalkerToLog.ShowCallstack(); }
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+namespace Tool // namespace Tool
+{
+	// 用于调测MFC库的日志工具
+	// 为了加快日志记录速度，保持日志文件运行中一直打开。
+	// 同时要求上面的 日志工具 提供支持文件符的函数方法接口。
+	class CMyMFCStudyLog
+	{
+	public:
+		// DLL STATUS。 MFC DLL 运行过程中不同时点的状态，自己根据需要手动设定。主要用于指导 调用的不同效率的日志函数方法。
+		typedef enum _CMFCDllStatus
+		{
+			IN_RAW_DLL_MAIN=0
+			, IN_GLOBAL_INIT
+			, IN_DLL_MAIN
+		} CMFCDllStatus;
+
+	private:
+		static CMFCDllStatus m_mfcDllStatus;
+	public:
+		// 设置 DLL STATUS。
+		static CMFCDllStatus SET_MFC_DLL_STATUS(const CMFCDllStatus status);
+
+	private:
+		#define MAX_STATIC_FILE 8
+		static char * m_staticFiles[MAX_STATIC_FILE];
+		static void * m_staticFilePtres[MAX_STATIC_FILE];
+		static int m_currentFiles;
+	public:
+		static void LOG_TO_FILE_STR(const char *file, const char *str, bool bOutputDateTime = true);
+		static void LOG_TO_FILE_FORMAT_STR(bool bOutputDateTime, const char *file, const char *format, ...);
+		static void LOG_TO_FILE_FORMAT_STR_ENDL(const char *file, const char *format, ...);
+		// 为兼容之前日志工具记录实现，提供输出到默认日志文件
+		static void LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char *format, ...);
+
+		// 专门用于释放 m_staticFiles 和 m_staticFilePtres 中的资源
+		static void FREE();
+	};
+} // namespace Tool
 
 
 

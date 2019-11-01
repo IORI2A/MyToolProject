@@ -21,7 +21,9 @@ protected:
 	}
 };
 
-void MyFunc5() { StackWalkerToLogFile swToLog; swToLog.ShowCallstack(); }
+#include "LogStackWalker.h"
+
+void MyFunc5() { /*StackWalkerToLogFile*/ CLogStackWalker swToLog; swToLog.ShowCallstack(); }
 void MyFunc4() { MyFunc5(); }
 void MyFunc3() { MyFunc4(); }
 void MyFunc2() { MyFunc3(); }

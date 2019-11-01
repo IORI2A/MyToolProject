@@ -703,21 +703,23 @@ namespace Tool
 	//	CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s(%d): ++++ %s", m_file.c_str(), m_line, m_func.c_str());
 	//}
 
-	CMyAutoLogName::CMyAutoLogName(const char *file, int line, const char *func, const char *logFie)
-		: m_pFile(NULL), m_line(line), m_pFunc(NULL), m_pLogFile(NULL)
+	CMyAutoLogName::CMyAutoLogName(const char *funcFileName, int funcLine, const char *func, const char *logFie)
+		: m_pFuncFileName(NULL), m_line(funcLine), m_pFunc(NULL), m_pLogFile(NULL)
 		  , m_startClock(0), m_finishClock(0)
 	{
 		m_startClock = clock();  // ¼ÇÂ¼¿ªÊ¼Ê±µÄÊ±ÖÓ
 
-		m_pFile = new char[128]();
+		m_pFuncFileName = new char[128]();
 		m_pFunc = new char[128]();
 		m_pLogFile = new char[128]();
 
-		strcpy(m_pFile, file);
+		strcpy(m_pFuncFileName, funcFileName);
 		strcpy(m_pFunc, func);
 		strcpy(m_pLogFile, logFie);
 
-		CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ++++ %s", m_pFile, m_line, m_pFunc);
+		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ++++ %s", m_pFuncFileName, m_line, m_pFunc);
+		// ¸ÄÓÃËÙ¶È¸ü¿ìµÄÊµÏÖ¡£
+		Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ++++ %s", m_pFuncFileName, m_line, m_pFunc);
 	}
 
 	//CMyAutoLogName::CMyAutoLogName(const char *file, const char *func, const char *logFie)
@@ -729,21 +731,23 @@ namespace Tool
 	//}
 
 	CMyAutoLogName::CMyAutoLogName(const char *file, const char *func, const char *logFie)
-		: m_pFile(NULL), m_line(0), m_pFunc(NULL), m_pLogFile(NULL)
+		: m_pFuncFileName(NULL), m_line(0), m_pFunc(NULL), m_pLogFile(NULL)
 		  , m_startClock(0), m_finishClock(0)
 	{
 		m_startClock = clock();  // ¼ÇÂ¼¿ªÊ¼Ê±µÄÊ±ÖÓ
 
-		m_pFile = new char[128]();
+		m_pFuncFileName = new char[128]();
 		//m_pFunc = new char[128](); ³öÏÖº¯ÊýÃû¹ý³¤Ê±£¬¿Õ¼ä²»¹»ÓÃ
 		m_pFunc = new char[512]();
 		m_pLogFile = new char[128]();
 
-		strcpy(m_pFile, file);
+		strcpy(m_pFuncFileName, file);
 		strcpy(m_pFunc, func);
 		strcpy(m_pLogFile, logFie);
 
-		CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ++++ %s", m_pFile, m_pFunc);
+		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ++++ %s", m_pFuncFileName, m_pFunc);
+		// ¸ÄÓÃËÙ¶È¸ü¿ìµÄÊµÏÖ¡£
+		Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ++++ %s", m_pFuncFileName, m_pFunc);
 	}
 #pragma warning(default: 4996)
 
@@ -772,16 +776,21 @@ namespace Tool
 
 		if (m_line)
 		{
-			CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s [%d clock ticks, %2.1f seconds]"
-				, m_pFile, m_line, m_pFunc, durationTick, durationSec);
+			//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s [%d clock ticks, %2.1f seconds]"
+			//	, m_pFuncFileName, m_line, m_pFunc, durationTick, durationSec);
+			// ¸ÄÓÃËÙ¶È¸ü¿ìµÄÊµÏÖ¡£
+			Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s [%d clock ticks, %2.1f seconds]"
+				, m_pFuncFileName, m_line, m_pFunc, durationTick, durationSec);
 		}
 		else
 		{
-			CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s [%d clock ticks, %2.1f seconds]"
-				, m_pFile, m_pFunc, durationTick, durationSec);
+			//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s [%d clock ticks, %2.1f seconds]"
+			//	, m_pFuncFileName, m_pFunc, durationTick, durationSec);
+			Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s [%d clock ticks, %2.1f seconds]"
+				, m_pFuncFileName, m_pFunc, durationTick, durationSec);
 		}
 
-		delete [] m_pFile;
+		delete [] m_pFuncFileName;
 		delete [] m_pFunc;
 		delete [] m_pLogFile;
 	}
@@ -802,12 +811,19 @@ namespace Tool
 //}
 
 #pragma warning(disable: 4996)
-void CMyLog::LogNotEndl(const char *file, const char *str)
+void CMyLog::LogNotEndl(const char *file, const char *str, bool bOutputDateTime)
 {
 	EnterCriticalSection(&m_myLogCriticalSection);
 
 	FILE *f = fopen(file, "a");
-	fprintf(f, "%s%s", CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S "), str);
+	if (bOutputDateTime)
+	{
+		fprintf(f, "%s%s", CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S "), str);
+	}
+	else
+	{
+		fprintf(f, "%s", str);
+	}
 	fclose(f);
 	// ²»´ø»»ÐÐ½áÊø·û¡£
 
@@ -820,16 +836,16 @@ void CTool::LOG_NOT_ENDL(const char *str)    // Ö§³ÖÖ±½ÓÎÄ±¾ÄÚÈÝ¡£ ²»´ø»»ÐÐ½áÊø·
 	m_staticMyLog.LogNotEndl("temp.log", str);
 }
 
-void CTool::LOG_NOT_ENDL(const char *file, const char *str)
+void CTool::LOG_NOT_ENDL(const char *file, const char *str, bool bOutputDateTime)
 {
-	m_staticMyLog.LogEndl(file, str);
+	m_staticMyLog.LogNotEndl(file, str, bOutputDateTime);
 }
 
 
 #pragma warning(disable: 4996)
 void CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR(const char * format, ...)    // ²»´ø»»ÐÐ½áÊø·û¡£
 {
-	char buffer[512];
+	char buffer[512] = {};
 	va_list args;
 	va_start (args, format);
 	vsprintf (buffer,format, args);
@@ -839,7 +855,7 @@ void CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR(const char * format, ...)    // ²»´ø»
 
 void CTool::LOG_TO_SPECIFIC_FILE_FORMAT_STR(const char *file, const char * format, ...)
 {
-	char buffer[512];
+	char buffer[512] = {};
 	va_list args;
 	va_start (args, format);
 	vsprintf (buffer,format, args);
@@ -905,3 +921,234 @@ void CTool::DELE_FUN_LOG_CRITICAL_SECTION()
 //swprintf(buffer, sizeof(buffer)/sizeof(wchar_t),  TEXT("%s Á¬½ÓÉè±¸Íê³É£¬·µ»Ø BOOL res = %d £¡ [%d clock ticks, %f seconds]\r\n")
 //  , CTool::GET_W_LOCAL_CURRENT_TIME(), res, durationTick, durationSec);
 //_stprintf ¸ù¾Ý¿íÕ­×Ö·û±»¶¨ÒåÎª  sprintf / swprintf 
+
+
+#pragma warning(disable: 4996)
+// Óë FUN_LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL ¡¢ FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL ¶ÔÓ¦µÄ²»´ø»»ÐÐ½áÊø·û
+// Ê¹ÓÃ FUN_LOG... Ö®Ç°¿ÉÒÔÏÈÔÚÀàËÆÈ«¾ÖµÄµØ·½Ö´ÐÐ INIT_FUN_LOG_CRITICAL_SECTION/DELE_FUN_LOG_CRITICAL_SECTION À´³õÊ¼»¯Ò»¸öÁÙ½çÇøËø£¬Ä¬ÈÏÒ²¿ÉÒÔ²»³õÊ¼»¯£¬´ËÊ±±ãÎÞ·¨¿ØÖÆ¶à²¢·¢¾ÍÊÇÁË
+void CTool::FUN_LOG_TO_DEFAULT_FILE_FORMAT_STR(const char * format, ...)
+{
+	if (m_bToolFunLogCriticalSectionInited)
+	{
+		EnterCriticalSection(&m_toolFunLogCriticalSection);
+	}
+
+	char buffer[512] = {};
+	va_list args;
+	va_start (args, format);
+	vsprintf (buffer,format, args);
+
+	FILE *f = fopen("temp.log", "a");
+	fprintf(f, "%s%s", CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S "), buffer);
+	fclose(f);
+
+	va_end (args);
+
+	if (m_bToolFunLogCriticalSectionInited)
+	{
+		LeaveCriticalSection(&m_toolFunLogCriticalSection);
+	}
+}
+
+void CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR(const char *file, const char * format, ...)
+{
+	if (m_bToolFunLogCriticalSectionInited)
+	{
+		EnterCriticalSection(&m_toolFunLogCriticalSection);
+	}
+
+	char buffer[512] = {};
+	va_list args;
+	va_start (args, format);
+	vsprintf (buffer,format, args);
+
+	FILE *f = fopen(file, "a");
+	fprintf(f, "%s%s", CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S "), buffer);
+	fclose(f);
+
+	va_end (args);
+
+	if (m_bToolFunLogCriticalSectionInited)
+	{
+		LeaveCriticalSection(&m_toolFunLogCriticalSection);
+	}
+}
+#pragma warning(default: 4996)
+
+
+
+
+#include <assert.h> 
+
+// warning C4482: Ê¹ÓÃÁË·Ç±ê×¼À©Õ¹: ÏÞ¶¨ÃûÖÐÊ¹ÓÃÁËÃ¶¾Ù¡°Tool::CMyMFCStudyLog::_CMFCDllStatus¡±
+//Tool::CMyMFCStudyLog::CMFCDllStatus m_mfcDllStatus = Tool::CMyMFCStudyLog::CMFCDllStatus::IN_RAW_DLL_MAIN; 
+Tool::CMyMFCStudyLog::CMFCDllStatus Tool::CMyMFCStudyLog::m_mfcDllStatus = Tool::CMyMFCStudyLog::IN_RAW_DLL_MAIN; 
+Tool::CMyMFCStudyLog::CMFCDllStatus Tool::CMyMFCStudyLog::SET_MFC_DLL_STATUS(const CMFCDllStatus status)
+{
+	m_mfcDllStatus = status;
+	return m_mfcDllStatus;
+}
+
+char * Tool::CMyMFCStudyLog::m_staticFiles[MAX_STATIC_FILE] = {};
+void * Tool::CMyMFCStudyLog::m_staticFilePtres[MAX_STATIC_FILE] = {};
+int Tool::CMyMFCStudyLog::m_currentFiles = 0;
+// µ÷ÓÃÈÕÖ¾¼ÇÂ¼º¯ÊýÇ°×îºÃ¼ì²éÉè¶¨Ò»ÏÂ DLL STATUS £¨ º¯Êý SET_MFC_DLL_STATUS £©¡£
+// ²»Í¬×´Ì¬µ÷ÓÃµÄÈÕÖ¾º¯Êý·½·¨²»Í¬£¬Ö´ÐÐÐ§ÂÊÒ²¾Í²»Ò»Ñù¡£
+#pragma warning(disable: 4996)
+void Tool::CMyMFCStudyLog::LOG_TO_FILE_STR(const char *file, const char *str, bool bOutputDateTime)
+{
+	// 1.ÎªÁË¼Ó¿ìÈÕÖ¾¼ÇÂ¼ËÙ¶È£¬±£³ÖÈÕÖ¾ÎÄ¼þÔËÐÐÖÐÒ»Ö±´ò¿ª¡£
+	// ±éÀúÅÐ¶¨ÊÇ·ñÒÑ¾­´ò¿ª¹ý¸ÃÎÄ¼þ
+	FILE *f = NULL;
+	for (int i = 0; i < min(m_currentFiles, MAX_STATIC_FILE); ++i)
+	{
+		char *p = m_staticFiles[i];
+		if ( p && (0 == strcmp(p, file)) )
+		{
+			f = (FILE *)(m_staticFilePtres[i]);
+			break;
+		}
+	}
+
+	// Èç¹ûÃ»ÓÐ£¬Ôò´ò¿ª¸ÃÎÄ¼þ£¬²¢½«¸ÃÎÄ¼þ·û¼°ÎÄ¼þÃû±£´æµ½¸÷×ÔµÄÊý×éÖÐ¡£
+	if (!f)
+	{
+		if (m_currentFiles < MAX_STATIC_FILE)
+		{
+			// ±£´æ ÎÄ¼þ·û
+			FILE *oldF = (FILE *)(m_staticFilePtres[m_currentFiles]);
+			if (oldF)
+			{
+				fclose(oldF);
+			}
+			f = fopen(file, "a");
+			m_staticFilePtres[m_currentFiles] = f;
+
+			// ±£´æ ÎÄ¼þÃû
+			char *oldFileName = m_staticFiles[m_currentFiles];
+			if (oldFileName)
+			{
+				delete oldFileName;
+			}
+			char *newFileName = new char[128]();
+			strcpy(newFileName, file);
+			m_staticFiles[m_currentFiles] = newFileName;
+
+			++m_currentFiles;
+		}
+		else
+		{
+			// ³¬³öÎÄ¼þÊý×é·¶Î§¡£
+			assert(0);
+		}
+	}
+
+	// 2.½øÐÐÈÕÖ¾¼ÇÂ¼¡£
+	if( IN_DLL_MAIN == m_mfcDllStatus )
+	{
+		// ÓÐ»¥³âËø
+		CTool::LOG_NOT_ENDL(file, str, bOutputDateTime);
+	}
+	else
+	{
+		if (bOutputDateTime)
+		{
+			fprintf(f, "%s%s", CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S "), str);
+		}
+		else
+		{
+			fprintf(f, "%s", str);
+		}
+	}
+}
+
+
+void CTool::LOG_NOT_ENDL(FILE *f, const char *str)
+{
+	m_staticMyLog.LogNotEndl(f, str);
+}
+
+
+void CMyLog::LogNotEndl(FILE *file, const char *str, bool bOutputDateTime)
+{
+	EnterCriticalSection(&m_myLogCriticalSection);
+
+	if (bOutputDateTime)
+	{
+		fprintf(file, "%s%s", CTool::GET_CURRENT_TIME("%Y-%m-%d %H:%M:%S "), str);
+	}
+	else
+	{
+		fprintf(file, "%s", str);
+	}
+
+	LeaveCriticalSection(&m_myLogCriticalSection);
+}
+
+
+void Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR(bool bOutputDateTime, const char *file, const char * format, ...)
+{
+	char buffer[512] = {};
+	va_list args;
+	va_start (args, format);
+	// ÓÐ¿ÉÄÜ³¬³öÊý×é·¶Î§¡£ÔÝÊ±²»¹Ü¡£
+	vsprintf (buffer,format, args);
+	va_end (args);
+
+	LOG_TO_FILE_STR(file, buffer, bOutputDateTime);
+}
+
+
+void Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(const char *file, const char * format, ...)
+{
+	char buffer[512] = {};
+	va_list args;
+	va_start (args, format);
+	int n = vsprintf (buffer,format, args);
+	va_end (args);
+
+	memset(buffer+n, '\n', 1);
+	//memset(buffer+n+1, '\0', 1);
+	//strcat(buffer, "\n");
+	LOG_TO_FILE_STR(file, buffer, true);
+}
+
+
+// Îª¼æÈÝÖ®Ç°ÈÕÖ¾¹¤¾ß¼ÇÂ¼ÊµÏÖ£¬Ìá¹©Êä³öµ½Ä¬ÈÏÈÕÖ¾ÎÄ¼þ
+void Tool::CMyMFCStudyLog::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char *format, ...)
+{
+	char buffer[512] = {};
+	va_list args;
+	va_start (args, format);
+	int n = vsprintf (buffer,format, args);
+	va_end (args);
+
+	memset(buffer+n, '\n', 1);
+	LOG_TO_FILE_STR("temp.log", buffer, true);
+}
+#pragma warning(default: 4996)
+
+
+// ×¨ÃÅÓÃÓÚÊÍ·Å m_staticFiles ºÍ m_staticFilePtres ÖÐµÄ×ÊÔ´
+void Tool::CMyMFCStudyLog::FREE()
+{
+	m_currentFiles = 0;
+	for (int i = 0; i < MAX_STATIC_FILE; ++i)
+	{
+		if (m_staticFiles[i])
+		{
+			delete m_staticFiles[i];
+			m_staticFiles[i] = NULL;
+		}
+
+		if (m_staticFilePtres[i])
+		{
+			fclose( (FILE *)(m_staticFilePtres[i]) );
+			m_staticFilePtres[i] = NULL;
+		}
+	}
+}
+
+
+
+

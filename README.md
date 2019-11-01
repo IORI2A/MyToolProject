@@ -1,3 +1,26 @@
+**2019-11-01**
+
+1. 日志工具 增加 与 FUN_LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL 、 FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL 对应的不带换行结束符的函数方法 。
+- 使用 FUN_LOG... 之前可以先在类似全局的地方执行 INIT_FUN_LOG_CRITICAL_SECTION/DELE_FUN_LOG_CRITICAL_SECTION 来初始化一个临界区锁，默认也可以不初始化，此时便无法控制多并发就是了。
+2. StackWalker 子类 CLogStackWalker ，实现仅记录名称符号。
+- 使用的是 Github 上的 StackWalker-1.0 
+3. 为了加快日志记录速度，保持日志文件运行中一直打开。 新实现用于调测MFC库的日志工具
+- 内部使用之前的 日志工具，要求之前的 日志工具 提供支持文件符的函数方法接口。不需要函数内部再打开/关闭文件。
+- 可根据需要手动设定 MFC DLL 运行过程中不同时点的状态。主要用于指导调用不同效率的日志函数方法。 IN_DLL_MAIN 状态下使用有互斥锁支持的函数方法。
+- 目前最多可同时支持打开 #define MAX_STATIC_FILE 8 个文件。
+- 增加 FREE 方法 专门用于释放 m_staticFiles 和 m_staticFilePtres 中的资源。 需要手动调用，可在调测结束位置进行调用释放。
+- 为兼容之前日志工具记录实现，提供输出到默认日志文件。
+4. 日志工具BUG及优化。
+- CTool::LOG_NOT_ENDL 错误调用 LogEndl 。
+- 部分 char buffer[512] 局部变量未初始化。
+- 日志工具 提供支持文件符的函数方法接口。
+- 日志工具 LogNotEndl 增加是否需要 输出日期时间 参数。
+- 优化 CMyAutoLogName 中相关变量命名。
+5. 相关日志记录调用日志方法更改为调用 速度更快的实现方法。
+- 经调测速度还是未能提升太多。
+
+
+
 **2019-10-30**
 
 1. 增加调测函数调用堆栈的工程项目 StackWalker 。
