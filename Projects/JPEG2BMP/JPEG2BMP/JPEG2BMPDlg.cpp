@@ -7,6 +7,8 @@
 #include "JPEG2BMPDlg.h"
 #include "afxdialogex.h"
 
+#include "util.h"
+
 #ifdef _DEBUG
 #define new DEBUG_NEW
 #endif
@@ -99,6 +101,33 @@ BOOL CJPEG2BMPDlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 
+	// 3. CImage 对象加载已经在内存中的图片数据（ IStream 流）。
+	// 先从指定文件提取数据到内存，再在内存上构建IStream流，CImage再加载IStream流（即加载图片数据）。
+	// 打开图片文件
+	FILE *imgFile = fopen("D:\\Photo\\27.jpg","rb");
+	if(imgFile)
+	{
+		fseek(imgFile, 0, SEEK_END);
+		long filesize = ftell(imgFile);
+		fseek(imgFile, 0, SEEK_SET);
+
+		// 分配足够内存，读取文件数据
+		HGLOBAL hFileData=GlobalAlloc(GMEM_MOVEABLE, filesize); 
+		if(hFileData) 
+		{
+			char *pFile =(char *)GlobalLock(hFileData);
+			int fsize = fread(pFile, sizeof(char), filesize, imgFile);
+			// 读取完成，及时关闭文件
+			fclose(imgFile);
+
+			// CImage 对象加载已经在内存中的图片数据
+			JPEG2BMP_Memory_CImage(pFile, fsize, &m_image);
+		} 
+	}
+
+	// 4. 将图片文件另存为另一个文件或者格式。
+	JPEG2BMP_File_CImage(L"D:\\Photo\\27.jpg", L"D:\\Photo\\27.bmp");
+
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
 
@@ -140,6 +169,19 @@ void CJPEG2BMPDlg::OnPaint()
 	}
 	else
 	{
+		//// 1. 简单使用 CImage 加载图片文件进行直接显示。 显示OK
+		//CImage backgroudImage;
+		//backgroudImage.Load(TEXT("D:\\Photo\\7.jpg"));
+		//CRect wndClientRect;
+		//this->GetClientRect(&wndClientRect);
+		// Draw 会自动拉伸缩放
+		//backgroudImage.Draw(this->GetDC()->GetSafeHdc(), wndClientRect);
+
+		// 通过加载 IStream 流的 CImage 进行显示。 显示OK
+		CRect wndClientRect;
+		this->GetClientRect(&wndClientRect);
+		m_image.Draw(this->GetDC()->GetSafeHdc(), wndClientRect);
+
 		CDialogEx::OnPaint();
 	}
 }
