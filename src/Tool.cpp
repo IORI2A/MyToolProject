@@ -719,7 +719,9 @@ namespace Tool
 
 		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ++++ %s", m_pFuncFileName, m_line, m_pFunc);
 		// 改用速度更快的实现。
-		Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ++++ %s", m_pFuncFileName, m_line, m_pFunc);
+		//Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ++++ %s", m_pFuncFileName, m_line, m_pFunc);
+		// 强制记录执行调用的函数。顺序调用，不挂起线程，应当不会导致卡顿。
+		Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ++++ %s", m_pFuncFileName, m_line, m_pFunc);
 	}
 
 	//CMyAutoLogName::CMyAutoLogName(const char *file, const char *func, const char *logFie)
@@ -747,7 +749,9 @@ namespace Tool
 
 		//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ++++ %s", m_pFuncFileName, m_pFunc);
 		// 改用速度更快的实现。
-		Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ++++ %s", m_pFuncFileName, m_pFunc);
+		//Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ++++ %s", m_pFuncFileName, m_pFunc);
+		// 强制记录执行调用的函数。顺序调用，不挂起线程，应当不会导致卡顿。
+		Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ++++ %s", m_pFuncFileName, m_pFunc);
 	}
 #pragma warning(default: 4996)
 
@@ -779,14 +783,19 @@ namespace Tool
 			//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s [%d clock ticks, %2.1f seconds]"
 			//	, m_pFuncFileName, m_line, m_pFunc, durationTick, durationSec);
 			// 改用速度更快的实现。
-			Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s [%d clock ticks, %2.1f seconds]"
+			//Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s [%d clock ticks, %2.1f seconds]"
+			//	, m_pFuncFileName, m_line, m_pFunc, durationTick, durationSec);
+			// 强制记录执行调用的函数。顺序调用，不挂起线程，应当不会导致卡顿。
+			Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s [%d clock ticks, %2.1f seconds]"
 				, m_pFuncFileName, m_line, m_pFunc, durationTick, durationSec);
 		}
 		else
 		{
 			//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s [%d clock ticks, %2.1f seconds]"
 			//	, m_pFuncFileName, m_pFunc, durationTick, durationSec);
-			Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s [%d clock ticks, %2.1f seconds]"
+			//Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s [%d clock ticks, %2.1f seconds]"
+			//	, m_pFuncFileName, m_pFunc, durationTick, durationSec);
+			Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s [%d clock ticks, %2.1f seconds]"
 				, m_pFuncFileName, m_pFunc, durationTick, durationSec);
 		}
 
@@ -983,9 +992,35 @@ void CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR(const char *file, const char * f
 // warning C4482: 使用了非标准扩展: 限定名中使用了枚举“Tool::CMyMFCStudyLog::_CMFCDllStatus”
 //Tool::CMyMFCStudyLog::CMFCDllStatus m_mfcDllStatus = Tool::CMyMFCStudyLog::CMFCDllStatus::IN_RAW_DLL_MAIN; 
 Tool::CMyMFCStudyLog::CMFCDllStatus Tool::CMyMFCStudyLog::m_mfcDllStatus = Tool::CMyMFCStudyLog::IN_RAW_DLL_MAIN; 
-Tool::CMyMFCStudyLog::CMFCDllStatus Tool::CMyMFCStudyLog::SET_MFC_DLL_STATUS(const CMFCDllStatus status)
+#pragma warning(disable: 4996)
+Tool::CMyMFCStudyLog::CMFCDllStatus Tool::CMyMFCStudyLog::SET_MFC_DLL_STATUS(const CMFCDllStatus status
+	, const char *file, int line, const char *func, const char *logFie)
 {
+	EnterCriticalSection(&m_mfcStudyLogCriticalSection);
+	char buffer[512] = {};
+	switch(status)
+	{
+	case IN_RAW_DLL_MAIN:
+		sprintf (buffer, "%s(%d): SET_MFC_DLL_STATUS [IN_RAW_DLL_MAIN] %s\n", file, line, func);
+		break;
+	case IN_GLOBAL_INIT:
+		sprintf (buffer, "%s(%d): SET_MFC_DLL_STATUS [IN_GLOBAL_INIT] %s\n", file, line, func);
+		break;
+	case IN_DLL_MAIN:
+		sprintf (buffer, "%s(%d): SET_MFC_DLL_STATUS [IN_DLL_MAIN] %s\n", file, line, func);
+		break;
+	case IN_NOT_LOG_STATUS:
+		sprintf (buffer, "%s(%d): SET_MFC_DLL_STATUS [IN_NOT_LOG_STATUS] %s\n", file, line, func);
+		break;
+	default:
+		sprintf (buffer, "%s(%d): SET_MFC_DLL_STATUS [UNKNOWN] %s\n", file, line, func);
+		break;
+	}
+	LOG_TO_FILE_STR(logFie, buffer);
+
 	m_mfcDllStatus = status;
+	LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
+
 	return m_mfcDllStatus;
 }
 
@@ -994,9 +1029,20 @@ void * Tool::CMyMFCStudyLog::m_staticFilePtres[MAX_STATIC_FILE] = {};
 int Tool::CMyMFCStudyLog::m_currentFiles = 0;
 // 调用日志记录函数前最好检查设定一下 DLL STATUS （ 函数 SET_MFC_DLL_STATUS ）。
 // 不同状态调用的日志函数方法不同，执行效率也就不一样。
-#pragma warning(disable: 4996)
 void Tool::CMyMFCStudyLog::LOG_TO_FILE_STR(const char *file, const char *str, bool bOutputDateTime)
 {
+	// IN_NOT_LOG_STATUS 权限最高的是否记录日志标识
+	if( IN_NOT_LOG_STATUS == m_mfcDllStatus )
+	{
+		return;
+	}
+	//if (0 < m_mfcNotLog)
+	//{
+	//	return;
+	//}
+	// 为方便 SET_NOT_LOG_FOR 使用来记录 m_mfcNotLog 的值，那么应当不与 m_mfcNotLog 关联，为防止外部引用，使用 protect 保护。
+	// 其他加锁方法使用，可不加锁限制
+
 	// 1.为了加快日志记录速度，保持日志文件运行中一直打开。
 	// 遍历判定是否已经打开过该文件
 	FILE *f = NULL;
@@ -1043,13 +1089,13 @@ void Tool::CMyMFCStudyLog::LOG_TO_FILE_STR(const char *file, const char *str, bo
 		}
 	}
 
-	// 2.进行日志记录。
-	if( IN_DLL_MAIN == m_mfcDllStatus )
-	{
-		// 有互斥锁
-		CTool::LOG_NOT_ENDL(file, str, bOutputDateTime);
-	}
-	else
+	// 2.进行日志记录。 // 外围已有互斥锁了
+	//if( IN_DLL_MAIN == m_mfcDllStatus )
+	//{
+	//	// 有互斥锁
+	//	CTool::LOG_NOT_ENDL(file, str, bOutputDateTime);
+	//}
+	//else
 	{
 		if (bOutputDateTime)
 		{
@@ -1059,6 +1105,7 @@ void Tool::CMyMFCStudyLog::LOG_TO_FILE_STR(const char *file, const char *str, bo
 		{
 			fprintf(f, "%s", str);
 		}
+		fflush(f);
 	}
 }
 
@@ -1081,6 +1128,7 @@ void CMyLog::LogNotEndl(FILE *file, const char *str, bool bOutputDateTime)
 	{
 		fprintf(file, "%s", str);
 	}
+	fflush(file);
 
 	LeaveCriticalSection(&m_myLogCriticalSection);
 }
@@ -1088,6 +1136,14 @@ void CMyLog::LogNotEndl(FILE *file, const char *str, bool bOutputDateTime)
 
 void Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR(bool bOutputDateTime, const char *file, const char * format, ...)
 {
+	EnterCriticalSection(&m_mfcStudyLogCriticalSection);
+
+	if (0 < m_mfcNotLog)
+	{
+		LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
+		return;
+	}
+
 	char buffer[512] = {};
 	va_list args;
 	va_start (args, format);
@@ -1096,11 +1152,21 @@ void Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR(bool bOutputDateTime, const ch
 	va_end (args);
 
 	LOG_TO_FILE_STR(file, buffer, bOutputDateTime);
+
+	LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
 }
 
 
 void Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(const char *file, const char * format, ...)
 {
+	EnterCriticalSection(&m_mfcStudyLogCriticalSection);
+
+	if (0 < m_mfcNotLog)
+	{
+		LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
+		return;
+	}
+
 	char buffer[512] = {};
 	va_list args;
 	va_start (args, format);
@@ -1111,12 +1177,22 @@ void Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(const char *file, const c
 	//memset(buffer+n+1, '\0', 1);
 	//strcat(buffer, "\n");
 	LOG_TO_FILE_STR(file, buffer, true);
+
+	LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
 }
 
 
 // 为兼容之前日志工具记录实现，提供输出到默认日志文件
 void Tool::CMyMFCStudyLog::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char *format, ...)
 {
+	EnterCriticalSection(&m_mfcStudyLogCriticalSection);
+
+	if (0 < m_mfcNotLog)
+	{
+		LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
+		return;
+	}
+
 	char buffer[512] = {};
 	va_list args;
 	va_start (args, format);
@@ -1125,6 +1201,8 @@ void Tool::CMyMFCStudyLog::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char *forma
 
 	memset(buffer+n, '\n', 1);
 	LOG_TO_FILE_STR("temp.log", buffer, true);
+
+	LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
 }
 #pragma warning(default: 4996)
 
@@ -1132,6 +1210,8 @@ void Tool::CMyMFCStudyLog::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char *forma
 // 专门用于释放 m_staticFiles 和 m_staticFilePtres 中的资源
 void Tool::CMyMFCStudyLog::FREE()
 {
+	EnterCriticalSection(&m_mfcStudyLogCriticalSection);
+
 	m_currentFiles = 0;
 	for (int i = 0; i < MAX_STATIC_FILE; ++i)
 	{
@@ -1147,8 +1227,146 @@ void Tool::CMyMFCStudyLog::FREE()
 			m_staticFilePtres[i] = NULL;
 		}
 	}
+
+	m_mfcNotLog = false;
+
+	LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
 }
 
 
+// 设置某种状态下不进行日志记录，该设置仅生效一次。不记录操作完成后，置该状态为0。
+int Tool::CMyMFCStudyLog::m_mfcNotLog = 0; 
+#pragma warning(disable: 4996)
+void Tool::CMyMFCStudyLog::SET_NOT_LOG_FOR(const bool notLog)
+{
+	EnterCriticalSection(&m_mfcStudyLogCriticalSection);
+
+	//m_mfcNotLog = notLog;
+	if (notLog)
+	{
+		++m_mfcNotLog;
+	}
+	else
+	{
+		//if (m_mfcNotLog > 0)
+		//{
+		//	--m_mfcNotLog;
+		//}
+		//else
+		//{
+		//	--m_mfcNotLog = 0;
+		//}
+		--m_mfcNotLog;
+	}
+
+	// 记录 m_mfcNotLog 的值
+	char buffer[512] = {};
+	if (notLog)
+	{
+		sprintf (buffer, "++++ MFC_NOT_LOG [%d]\n", m_mfcNotLog);
+	}
+	else
+	{
+		sprintf (buffer, "---- MFC_NOT_LOG [%d]\n", m_mfcNotLog);
+	}
+
+	LOG_TO_FILE_STR("temp.log", buffer);
+
+	LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
+}
+#pragma warning(default: 4996)
 
 
+// 增加一个日志记录互斥锁
+CRITICAL_SECTION Tool::CMyMFCStudyLog::m_mfcStudyLogCriticalSection;
+bool Tool::CMyMFCStudyLog::m_bMfcStudyLogCriticalSectionInited = false;
+void Tool::CMyMFCStudyLog::INIT_MFC_STUDY_LOG_CRITICAL_SECTION()
+{
+	if (!m_bMfcStudyLogCriticalSectionInited)
+	{
+		InitializeCriticalSection(&m_mfcStudyLogCriticalSection);
+		m_bMfcStudyLogCriticalSectionInited = true;
+	}
+}
+
+void Tool::CMyMFCStudyLog::DELE_MFC_STUDY_LOG_CRITICAL_SECTION()
+{
+	if (m_bMfcStudyLogCriticalSectionInited)
+	{
+		InitializeCriticalSection(&m_mfcStudyLogCriticalSection);
+		m_bMfcStudyLogCriticalSectionInited = false;
+	}
+	
+}
+
+
+void Tool::CMyMFCStudyLog::LOG_TO_DEFAULT_FILE_STACK_WALKER()
+{
+	EnterCriticalSection(&m_mfcStudyLogCriticalSection);
+
+	// 及时判定以免无效的遍历调用堆栈
+	if (0 < m_mfcNotLog)
+	{
+		LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
+		return;
+	}
+
+	CLogStackWalker __myStackWalkerToLog;
+	__myStackWalkerToLog.ShowCallstack();
+
+	LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
+}
+
+
+// 增加记录 设置是否打印状态的 文件、行号、函数出处，便于分析日志。
+#pragma warning(disable: 4996)
+void Tool::CMyMFCStudyLog::SET_NOT_LOG_FOR(const bool notLog, const char *file, int line, const char *func)
+{
+	EnterCriticalSection(&m_mfcStudyLogCriticalSection);
+
+	//m_mfcNotLog = notLog;
+	if (notLog)
+	{
+		++m_mfcNotLog;
+	}
+	else
+	{
+		--m_mfcNotLog;
+	}
+
+	// 记录 m_mfcNotLog 的值
+	char buffer[512] = {};
+	if (notLog)
+	{
+		sprintf (buffer, "%s(%d): [MFC_NOT_LOG = %d +] %s\n", file, line, m_mfcNotLog, func);
+	}
+	else
+	{
+		sprintf (buffer, "%s(%d): [MFC_NOT_LOG = %d -] %s\n", file, line, m_mfcNotLog, func);
+	}
+
+	LOG_TO_FILE_STR("temp.log", buffer);
+
+	LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
+}
+
+
+// 强制输出内容。不受 m_mfcNotLog 计数控制。目前提供给 CMyAutoLogName 使用，强制记录执行调用的函数。（非反向遍历函数调用堆栈）
+void Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(const char *file, const char * format, ...)
+{
+	EnterCriticalSection(&m_mfcStudyLogCriticalSection);
+
+	char buffer[512] = {};
+	va_list args;
+	va_start (args, format);
+	int n = vsprintf (buffer,format, args);
+	va_end (args);
+
+	memset(buffer+n, '\n', 1);
+	//memset(buffer+n+1, '\0', 1);
+	//strcat(buffer, "\n");
+	LOG_TO_FILE_STR(file, buffer, true);
+
+	LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
+}
+#pragma warning(default: 4996)

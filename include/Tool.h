@@ -184,31 +184,65 @@ namespace Tool // namespace Tool
 			IN_RAW_DLL_MAIN=0
 			, IN_GLOBAL_INIT
 			, IN_DLL_MAIN
+			// 增加一个不进行日志记录的状态
+			, IN_NOT_LOG_STATUS
 		} CMFCDllStatus;
 
 	private:
 		static CMFCDllStatus m_mfcDllStatus;
 	public:
 		// 设置 DLL STATUS。
-		static CMFCDllStatus SET_MFC_DLL_STATUS(const CMFCDllStatus status);
+		static CMFCDllStatus SET_MFC_DLL_STATUS(const CMFCDllStatus status
+			, const char *file, int line, const char *func, const char *logFie);
 
 	private:
 		#define MAX_STATIC_FILE 8
 		static char * m_staticFiles[MAX_STATIC_FILE];
 		static void * m_staticFilePtres[MAX_STATIC_FILE];
 		static int m_currentFiles;
-	public:
+	protected:
+		// 为方便 SET_NOT_LOG_FOR 使用来记录 m_mfcNotLog 的值，那么应当不与 m_mfcNotLog 关联，为防止外部引用，使用 protect 保护。
 		static void LOG_TO_FILE_STR(const char *file, const char *str, bool bOutputDateTime = true);
+	public:
 		static void LOG_TO_FILE_FORMAT_STR(bool bOutputDateTime, const char *file, const char *format, ...);
 		static void LOG_TO_FILE_FORMAT_STR_ENDL(const char *file, const char *format, ...);
 		// 为兼容之前日志工具记录实现，提供输出到默认日志文件
 		static void LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL(const char *format, ...);
+		// 强制输出内容。不受 m_mfcNotLog 计数控制。目前提供给 CMyAutoLogName 使用，强制记录执行调用的函数。（非反向遍历函数调用堆栈）
+		static void FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(const char *file, const char *format, ...);
 
 		// 专门用于释放 m_staticFiles 和 m_staticFilePtres 中的资源
 		static void FREE();
+
+	private:
+		//static bool m_mfcNotLog;
+		// 使用引用计数方式
+		static int m_mfcNotLog;
+	public:
+		// 设置 不需要进行日志记录的状态。 // 无法控制 构造函数 初始化列表的执行。
+		static void SET_NOT_LOG_FOR(const bool notLog);
+		// 增加记录 设置是否打印状态的 文件、行号、函数出处，便于分析日志。
+		static void SET_NOT_LOG_FOR(const bool notLog, const char *file, int line, const char *func);
+
+	private:
+		// 增加一个日志记录互斥锁，日志记录函数方法使用前需要初始化锁，使用后需要释放锁。
+		static CRITICAL_SECTION m_mfcStudyLogCriticalSection;
+		// 防止重复初始化互斥锁
+		static bool m_bMfcStudyLogCriticalSectionInited;
+	public:
+		static void INIT_MFC_STUDY_LOG_CRITICAL_SECTION();
+		static void DELE_MFC_STUDY_LOG_CRITICAL_SECTION();
+
+	public:
+		// 更有效的控制调用堆栈打印。及时判定，提高速度。
+		static void LOG_TO_DEFAULT_FILE_STACK_WALKER();
 	};
 } // namespace Tool
 
 
+// 使用宏便于记录文件、行号、函数名等信息，便于分析日志内容
+#define TOOL_SET_NOT_LOG(notLog)     Tool::CMyMFCStudyLog::SET_NOT_LOG_FOR(notLog, __FILE__, __LINE__, __FUNCTION__) 
+
+#define TOOL_SET_MFC_DLL_STATUS(status)    Tool::CMyMFCStudyLog::SET_MFC_DLL_STATUS(status, __FILE__, __LINE__, __FUNCTION__, "temp.log")
 
 #endif /*__TOOL_H__*/

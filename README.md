@@ -1,3 +1,25 @@
+**2019-11-06**
+
+1. 增加一个可设定是否不进行日志记录的函数方法。
+- 为方便 SET_NOT_LOG_FOR 使用来记录 m_mfcNotLog 的值，那么 LOG_TO_FILE_STR 应当不与 m_mfcNotLog 关联，为防止外部引用，使用 protect 保护。
+- 使用引用计数方式，便于日志分析何处进行了增减。
+- 无法控制 构造函数 初始化列表的执行。
+- 增加记录 设置时的 文件、行号、函数出处，便于分析日志。
+- 使用宏简化 SET_NOT_LOG_FOR 的调用， 便于记录文件、行号、函数名等信息，便于分析日志内容
+2. 增加一个日志记录互斥锁，日志记录函数方法使用前需要初始化锁，使用后需要释放锁。
+-  外围已有互斥锁了，可优化不再调用 CTool::LOG_NOT_ENDL 。
+3. 日志打印方法内部应该及时输出缓冲内容到文件。
+4. 增加强制输出内容的日志函数 FORCE_LOG_TO_FILE_FORMAT_STR_ENDL 。
+- 不受 m_mfcNotLog 计数控制。目前提供给 CMyAutoLogName 使用，强制记录执行调用的函数。顺序调用，不挂起线程，应当不会导致卡顿。（非反向遍历函数调用堆栈）
+- 受 SET_MFC_DLL_STATUS 控制， IN_NOT_LOG_STATUS 可控制所有日志记录都没有输出。
+5. 修改 SET_MFC_DLL_STATUS ， 目前主要用于设置 IN_NOT_LOG_STATUS 。并实现记录文件、行号、函数名等信息，便于分析日志内容。
+- IN_NOT_LOG_STATUS 权限最高的是否记录日志标识。可控制 FORCE_LOG_TO_FILE_FORMAT_STR_ENDL 内部调用的 LOG_TO_FILE_STR 。
+- 使用宏简化 SET_NOT_LOG_FOR 的调用， 便于记录文件、行号、函数名等信息，便于分析日志内容
+6. 日志工具 CMyMFCStudyLog 内部实现调用堆栈打印，更有效的控制调用堆栈打印。
+- 与 m_mfcNotLog 关联，及时判定，提高速度。
+7. CMyMFCStudyLog::LOG_TO_DEFAULT_FILE_STACK_WALKER 已经进行是否需要打印日志的判定  且 LOG_TO_FILE_STR 是无法访问的 protected 成员
+
+
 **2019-11-01**
 
 1. 日志工具 增加 与 FUN_LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL 、 FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL 对应的不带换行结束符的函数方法 。

@@ -17,7 +17,9 @@ void CLogStackWalker::OnOutput(LPCSTR szText)
 {
 	//CTool::FUN_LOG_TO_DEFAULT_FILE_FORMAT_STR(szText);
 	// 改用速度更快的实现。
-	Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR(true, "temp.log", szText);
+	Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR(false, "temp.log", szText);
+	// CMyMFCStudyLog::LOG_TO_DEFAULT_FILE_STACK_WALKER 已经进行是否需要打印日志的判定  // 无法访问 protected 成员
+	//Tool::CMyMFCStudyLog::LOG_TO_FILE_STR("temp.log", szText, true);
 }
 
 // 为仅记录名称符号
