@@ -101,8 +101,6 @@ BOOL CJPEG2BMPDlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 
-	// 3. CImage 对象加载已经在内存中的图片数据（ IStream 流）。
-	// 先从指定文件提取数据到内存，再在内存上构建IStream流，CImage再加载IStream流（即加载图片数据）。
 	// 打开图片文件
 	FILE *imgFile = fopen("D:\\Photo\\27.jpg","rb");
 	if(imgFile)
@@ -120,13 +118,26 @@ BOOL CJPEG2BMPDlg::OnInitDialog()
 			// 读取完成，及时关闭文件
 			fclose(imgFile);
 
-			// CImage 对象加载已经在内存中的图片数据
-			JPEG2BMP_Memory_CImage(pFile, fsize, &m_image);
+			//// 3. CImage 对象加载已经在内存中的图片数据（ IStream 流）。
+			//// 指定内存数据，在内存上构建IStream流，CImage再加载IStream流（即加载图片数据）。
+			//JPEG2BMP_Memory_CImage(pFile, fsize, &m_image);
+
+			// 5. 使用 GID+ Image Class 将内存中的JPEG二进制数据转换为BMP位图数据。测试OK
+			std::string strOutBmp;
+			JPEG2BMP_Memory_Image(pFile, fsize, strOutBmp);
+
+			// 再将转换后数据保存为文件，验证转换是否正确。测试OK
+			FILE *bmpSaveFile = fopen("D:\\Photo\\27.bmp","wb");
+			if(bmpSaveFile)
+			{
+				int writeSize = fwrite(strOutBmp.c_str(), sizeof(char), strOutBmp.size(), bmpSaveFile);
+				fclose(bmpSaveFile);
+			}
 		} 
 	}
 
-	// 4. 将图片文件另存为另一个文件或者格式。
-	JPEG2BMP_File_CImage(L"D:\\Photo\\27.jpg", L"D:\\Photo\\27.bmp");
+	//// 4. 将图片文件另存为另一个文件或者格式。测试OK
+	//JPEG2BMP_File_CImage(L"D:\\Photo\\27.jpg", L"D:\\Photo\\27.bmp");
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -177,10 +188,10 @@ void CJPEG2BMPDlg::OnPaint()
 		// Draw 会自动拉伸缩放
 		//backgroudImage.Draw(this->GetDC()->GetSafeHdc(), wndClientRect);
 
-		// 通过加载 IStream 流的 CImage 进行显示。 显示OK
-		CRect wndClientRect;
-		this->GetClientRect(&wndClientRect);
-		m_image.Draw(this->GetDC()->GetSafeHdc(), wndClientRect);
+		//// 通过加载 IStream 流的 CImage 进行显示。 显示OK
+		//CRect wndClientRect;
+		//this->GetClientRect(&wndClientRect);
+		//m_image.Draw(this->GetDC()->GetSafeHdc(), wndClientRect);
 
 		CDialogEx::OnPaint();
 	}
