@@ -1,0 +1,23 @@
+## 虹软人脸识开发SDK V1.2 
+
+```
+18108982272
+gdlizhi1988
+
+APP ID：778jFQBaFNsKcXNEEC7cJKEGVrhyymea9vdeQUAHWPaQ
+
+SDK KEY
+
+FD
+F24jmL8NfHfvXX8byj58KzuBH7YFrCivRATnR2pcQPWV
+FT
+F24jmL8NfHfvXX8byj58Kzu47iH6mwJ6EN1gdyRq9eMn
+FR
+F24jmL8NfHfvXX8byj58KzufviaybguE2QLuLxNCkRnF
+AGE
+F24jmL8NfHfvXX8byj58KzuvFX7GyjT3p3BvTjgzDepz
+GENDER
+F24jmL8NfHfvXX8byj58Kzv3QvNUFgb8kxjJz9zAUiaW
+```
+
+**示例代码太简单，有些不足于运行。**

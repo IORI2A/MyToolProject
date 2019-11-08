@@ -1,0 +1,46 @@
+////////////////////////////////////////////////////////////////////////
+//               ArcSoft Age Estimation Library 	      	      //
+////////////////////////////////////////// /////////////////////////////
+
+Introduction:
+ArcSoft Age Estimation Library provides the universal interfaces to estimate age automatically.
+
+Publish date:
+10/21/2019
+
+Version:
+1.2.0.726
+
+Supported platform:
+VS2013_WIN32
+
+Compile Options:
+default
+
+Dependency:
+none
+
+Known issues:
+None.
+
+File List:
+|---doc
+|   |---ARCSOFT_AGE_ESTIMATION_DEVELOPER'S_GUIDE.pdf   Developer's user guide document
+|---inc
+|   |---arcsoft_fsdk_age_estimation.h                  Head file for age estimation
+|   |---amcomdef.h                                     Head file for platform type definition
+|   |---ammem.h                                        Header file for platform memory management
+|   |---asvloffscreen.h                                Header file for image format definition
+|   |---merror.h                                       Header file for error definition
+|   |
+|---lib
+|   |---libarcsoft_fsdk_age_estimation.dll             Dynamic library file for age estimation engine
+|   |---libarcsoft_fsdk_age_estimation.lib             Library file for age estimation engine
+|   |
+|---samplecode
+|   |---samplecode.cpp                                 Sample codes
+|---releasenotes.txt                                   This file.
+
+Change Logs:
+Initial Version
+

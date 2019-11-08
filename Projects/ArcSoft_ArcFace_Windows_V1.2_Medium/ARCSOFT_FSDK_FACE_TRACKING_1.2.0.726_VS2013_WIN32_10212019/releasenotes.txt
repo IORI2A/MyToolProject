@@ -1,0 +1,46 @@
+////////////////////////////////////////////////////////////////////////////////
+//                   ArcSoft Face Tracking Library 		              //        
+////////////////////////////////////////// /////////////////////////////////////
+
+Introduction:
+ArcSoft Face Tracking Library provides the universal interfaces to detect and track face.
+
+Publish date:
+10/21/2019
+
+
+Version:
+1.2.0.726
+
+Supported platform:
+VS2013_WIN32
+
+Compile Options:
+default
+
+Dependency:
+none
+
+Known issues:
+None.
+
+File List:
+|---doc
+|   |---ARCSOFT_FACE_TRACKING_DEVELOPER'S_GUIDE.pdf     Developer's user guide document
+|---inc
+|   |---arcsoft_fsdk_face_tracking.h                    Head file for face detection
+|   |---amcomdef.h                                      Head file for platform type definition 
+|   |---ammem.h                                         Header file for platform memory management
+|   |---asvloffscreen.h                                 Header file for image format definition
+|   |---merror.h                                        Header file for error definition
+|   |
+|---lib
+|   |---libarcsoft_fsdk_face_tracking.dll               Dynamic library file for face tracking engine
+|   |---libarcsoft_fsdk_face_tracking.lib               Library file for face tracking engine
+|   |
+|---samplecode
+|   |---samplecode.cpp                                  Sample codes
+|---releasenotes.txt                                    This file.
+
+Change Logs:
+Initial version
