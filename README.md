@@ -7,6 +7,7 @@
 - 预览视频并捕获帧图片。
 2. 学习网上有关使用 DirectShow 进行摄像头预览及捕获帧图片工程。命名为 VideoPreviewAndFramesCapture 。
 - Video Preview and Frames Capture to Memory with SampleGrabber in Buffered Mode
+- 转为使用 vs2010 调测。
 
 
 
