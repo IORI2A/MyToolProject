@@ -74,6 +74,7 @@
       <PrecompiledHeader>Use</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <AdditionalIncludeDirectories>E:\LZ\test\MyToolProject\Projects\ArcSoft_ArcFace_Windows_V1.2_Medium\ARCSOFT_FSDK_FACE_RECOGNITION_1.2.0.726_VS2013_WIN32_10212019\inc;E:\LZ\test\MyToolProject\Projects\ArcSoft_ArcFace_Windows_V1.2_Medium\ARCSOFT_FSDK_FACE_DETECTION_1.2.0.726_VS2013_WIN32_10212019\inc;E:\LZ\test\MyToolProject\Projects\ArcSoft_ArcFace_Windows_V1.2_Medium\ARCSOFT_FSDK_FACE_TRACKING_1.2.0.726_VS2013_WIN32_10212019\inc;E:\LZ\test\MyToolProject\include;E:\LZ\test\MyToolProject\Projects\StackWalker\StackWalker</AdditionalIncludeDirectories>
     </ClCompile>
     <ResourceCompile>
       <PreprocessorDefinitions>_DEBUG;%(PreprocessorDefinitions)</PreprocessorDefinitions>
@@ -85,6 +86,7 @@
       <GenerateDebugInformation>true</GenerateDebugInformation>
       <SubSystem>Windows</SubSystem>
       <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalLibraryDirectories>E:\LZ\test\MyToolProject\Projects\ArcSoft_ArcFace_Windows_V1.2_Medium\ARCSOFT_FSDK_FACE_RECOGNITION_1.2.0.726_VS2013_WIN32_10212019\lib;E:\LZ\test\MyToolProject\Projects\ArcSoft_ArcFace_Windows_V1.2_Medium\ARCSOFT_FSDK_FACE_DETECTION_1.2.0.726_VS2013_WIN32_10212019\lib;E:\LZ\test\MyToolProject\Projects\ArcSoft_ArcFace_Windows_V1.2_Medium\ARCSOFT_FSDK_FACE_TRACKING_1.2.0.726_VS2013_WIN32_10212019\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">

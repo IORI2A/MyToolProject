@@ -1,3 +1,11 @@
+**2019-11-12**
+
+1. 工程 VideoPreviewAndFramesCapture 合入虹软人脸识别功能，调测学习人脸识别认证。
+- 人脸追踪(FT) ARCSOFT_FSDK_FACE_TRACKING
+- 人脸检测(FD) ARCSOFT_FSDK_FACE_DETECTION
+- 人脸识别(FR) ARCSOFT_FSDK_FACE_RECOGNITION
+
+
 **2019-11-08**
 
 1. 增加使用 DirectShow 进行摄像头视频捕获截取帧图片的工程 CameraVedio 。

@@ -96,6 +96,7 @@ HRESULT sgGetSampleGrabberMediaType()
         return hr;
 }
 
+// 构造位图结构，并将帧图像数据（位图数据）封装成 Bitmap 对象。
 Gdiplus::Bitmap *sgGetBitmap()
 {        
         if (pGrabber == 0 || pBuffer == 0 || gChannels != 3)
@@ -117,6 +118,9 @@ Gdiplus::Bitmap *sgGetBitmap()
                 return 0;
 }
 
+// 抓取帧图像数据 
+// 帧图像数据，实际就已经是位图数据。只是不确定是 DIB ，还是非 DIB 。
+// 缓冲模式，从缓冲区中提取当前帧图像。
 unsigned char* sgGrabData()
 {
         HRESULT hr;
@@ -124,6 +128,7 @@ unsigned char* sgGrabData()
         if (pGrabber == 0)
                 return 0;
 
+		// 第一次调用 GetCurrentBuffer 确定图像数据大小
         long Size = 0;
         hr = pGrabber->GetCurrentBuffer(&Size, NULL);
         if (FAILED(hr))
@@ -135,15 +140,18 @@ unsigned char* sgGrabData()
                 pBuffer = new unsigned char[pBufferSize];
         }
 
+		// 第二次调用 GetCurrentBuffer 获取图像数据
         hr = pGrabber->GetCurrentBuffer(&pBufferSize, (long*)pBuffer);
         if (FAILED(hr))
                 return 0;
         else {
+				// 图像数据进行反转处理
                 sgFlipUpDown(pBuffer);
                 return pBuffer;                
         }
 }
 
+// 获取帧图像数据（位图数据）的大小
 long sgGetBufferSize()
 {
         return pBufferSize;
