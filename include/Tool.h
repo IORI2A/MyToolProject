@@ -165,11 +165,6 @@ namespace Tool // namespace Tool
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
-#include "LogStackWalker.h"
-#define TOOL_LOG_STACK_WALKER() { CLogStackWalker __myStackWalkerToLog; __myStackWalkerToLog.ShowCallstack(); }
-
-
-//////////////////////////////////////////////////////////////////////////////////////////////////////
 namespace Tool // namespace Tool
 {
 	// 用于调测MFC库的日志工具
@@ -234,7 +229,9 @@ namespace Tool // namespace Tool
 		static void DELE_MFC_STUDY_LOG_CRITICAL_SECTION();
 
 	public:
-		// 更有效的控制调用堆栈打印。及时判定，提高速度。
+		// 更有效的控制调用堆栈打印。及时判定 m_mfcNotLog 计数，是否需要记录，提高速度。
+		// 如果使用该方法涉及到 引用 ToolLogStackWalker.h 及 StackWalker 工程中相关代码文件，请加载引用这些内容。
+		// 无法从类中分离出方法的声明。 其定义实现于 ToolLogStackWalker.cpp 中。
 		static void LOG_TO_DEFAULT_FILE_STACK_WALKER();
 	};
 } // namespace Tool
@@ -244,5 +241,8 @@ namespace Tool // namespace Tool
 #define TOOL_SET_NOT_LOG(notLog)     Tool::CMyMFCStudyLog::SET_NOT_LOG_FOR(notLog, __FILE__, __LINE__, __FUNCTION__) 
 
 #define TOOL_SET_MFC_DLL_STATUS(status)    Tool::CMyMFCStudyLog::SET_MFC_DLL_STATUS(status, __FILE__, __LINE__, __FUNCTION__, "temp.log")
+
+
+
 
 #endif /*__TOOL_H__*/

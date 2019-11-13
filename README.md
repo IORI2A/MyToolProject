@@ -1,9 +1,26 @@
+**2019-11-13**
+
+1. 解决 warning: C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失
+- 参考： https://www.cnblogs.com/markleaf/p/7781127.html 
+- 转换Code文件为： UTF-8 带BOM 格式；
+- 如果是 Qt Creator，设置【项目编辑器】，【文件编码】为：UTF-8，【UTF-8 BOM】：如果编码是UTF-8则添加。最后随便改动一下出现警告的文件保存，就会保存为：UTF-8 带BOM 格式。
+- 如果是 VS IDE，打开有该warning的文件，点击【文件】选【高级保存选项】，改变编码格式为【简体中文（GB2312）- 代码页936】或【Unicode（UTF-8 带签名）-代码页65001】，保存。
+- 仅实测：VS IDE，【文件】选【高级保存选项】，改变编码格式为【简体中文（GB2312）- 代码页936】 可行。
+2. 将打印函数调用堆栈的功能独立为单独的代码文件，需要使用再加载相关内容。
+- 之前引用Tool的工程就可以不用再加载 StackWalker 的相关内容。
+3. 编译阶段打印宏内容。
+- 定义两个辅助宏。
+4. 虹软 SDK 免费使用，是需要一年到期又重新申请下载更新引擎。 
+
+
+
 **2019-11-12**
 
 1. 工程 VideoPreviewAndFramesCapture 合入虹软人脸识别功能，调测学习人脸识别认证。
 - 人脸追踪(FT) ARCSOFT_FSDK_FACE_TRACKING
 - 人脸检测(FD) ARCSOFT_FSDK_FACE_DETECTION
 - 人脸识别(FR) ARCSOFT_FSDK_FACE_RECOGNITION
+
 
 
 **2019-11-08**

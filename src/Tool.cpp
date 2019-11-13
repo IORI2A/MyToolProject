@@ -1300,24 +1300,6 @@ void Tool::CMyMFCStudyLog::DELE_MFC_STUDY_LOG_CRITICAL_SECTION()
 }
 
 
-void Tool::CMyMFCStudyLog::LOG_TO_DEFAULT_FILE_STACK_WALKER()
-{
-	EnterCriticalSection(&m_mfcStudyLogCriticalSection);
-
-	// 及时判定以免无效的遍历调用堆栈
-	if (0 < m_mfcNotLog)
-	{
-		LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
-		return;
-	}
-
-	CLogStackWalker __myStackWalkerToLog;
-	__myStackWalkerToLog.ShowCallstack();
-
-	LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
-}
-
-
 // 增加记录 设置是否打印状态的 文件、行号、函数出处，便于分析日志。
 #pragma warning(disable: 4996)
 void Tool::CMyMFCStudyLog::SET_NOT_LOG_FOR(const bool notLog, const char *file, int line, const char *func)
