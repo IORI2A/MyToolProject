@@ -1,3 +1,13 @@
+**2019-11-19**
+
+1. 学习使用 Qt Widgets 编程。
+- 入门示例 Notepad 源码位置 snippets/widgets-tutorial/notepad 。（D:\Qt\Qt5.8.0\5.8\Src\qtdoc\doc\src\snippets\widgets-tutorial\notepad）
+- 参考文档说明 Getting Started Programming with Qt Widgets ，仿写 Notepad 程序(QT_Study\Notepad)。
+2. 学习使用 Qt Quick (QML) 编程。
+- 入门示例源码位置 examples/quick/tutorials/gettingStartedQml 。(D:\Qt\Qt5.8.0\Examples\Qt-5.8\quick\tutorials\gettingStartedQml)
+- 参考文档说明 Getting Started Programming with Qt Quick ，仿写 text editor 程序(QT_Study\GettingStartedQml)。（仅仿写部分QML）
+3. 构建一个命令行脚本 del_compile_temp_file.bat 删除不需要归档的文件。如，*.qmlproject.user *.pro.user *.qmlc 
+
 **2019-11-13**
 
 1. 解决 warning: C4819: 该文件包含不能在当前代码页(936)中表示的字符。请将该文件保存为 Unicode 格式以防止数据丢失

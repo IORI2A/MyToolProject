@@ -31,3 +31,7 @@ Release/*
 **/Release/*
 
 Projects/GDI_CapturingAnImage/GDI_CapturingAnImage/captureqwsx.bmp
+
+**/*.qmlc
+**/*.pro.user
+**/*.qmlproject.user
