@@ -1,3 +1,12 @@
+```
+该目录(QT_Study)下的示例文档是参考官方资料进行学习产生的。
+但为了方便整合QT方面的学习资料放到一起，新建子级目录以 QT_Study_X 命名，说明是其他网络、书籍方面的资料（非官方）。
+
+QT_Study_2 
+学习[Qt教程，Qt5编程入门教程（非常详细）](http://c.biancheng.net/qt/) 时生成的内容。
+```
+
+
 
 # Getting Started with Qt 
 
