@@ -39,6 +39,7 @@
 ****************************************************************************/
 
 import QtQuick 2.0
+// 模块对应到目录名 FileDialog 。
 import FileDialog 1.0
 
 Rectangle {
