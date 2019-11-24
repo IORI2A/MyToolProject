@@ -10,7 +10,6 @@ QT_Study_2
 
 # Getting Started with Qt 
 
-
 **Getting Started Programming with Qt Widgets**
 
 - Notepad 示例程序演示使用 C++ 语言和 Qt Widgets。
@@ -41,3 +40,11 @@ QT_Study_2
 
 **方便整合QT方面的学习资料集中到一起，新建子级目录以 QT_Study_X 命名，说明是其他网络、书籍方面的资料（非官方）。**
 - 直接在 QT_Study 目录下的示例文档一般是参考官方资料进行学习产生的。
+
+** Blocking Master Example **
+
+- 想要研究一下 QT 多线程编程，Welcome 页面示例中搜索到该示例。
+- 示例程序位置（D:\Qt\Qt5.8.0\Examples\Qt-5.8\serialport\blockingmaster）。
+- 串口编程实现（同步方式）。
+- 涉及多线程方面技术。
+- 同时建立一个 BlockingMaster 工程仿写、调测分析。
