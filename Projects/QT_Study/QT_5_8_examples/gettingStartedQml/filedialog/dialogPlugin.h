@@ -43,9 +43,12 @@
 
 #include <QtQml/QQmlExtensionPlugin>
 
+// 定义插件类，继承 QQmlExtensionPlugin ，并实现其方法 registerTypes 。
 class DialogPlugin : public QQmlExtensionPlugin
 {
+    // Q_OBJECT 用于生成对象元信息。
     Q_OBJECT
+    // Q_PLUGIN_METADATA 导出插件的宏。
     Q_PLUGIN_METADATA(IID "org.qt-project.QmlExtensionPlugin.FileDialog")
     public:
         //registerTypes is inherited from QQmlExtensionPlugin

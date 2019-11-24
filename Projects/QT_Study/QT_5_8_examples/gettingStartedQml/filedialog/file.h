@@ -44,6 +44,7 @@
 #include <QObject>
 #include <QString>
 
+// 仅是实现为简单记录文件名。
 class File : public QObject
 {
     Q_OBJECT

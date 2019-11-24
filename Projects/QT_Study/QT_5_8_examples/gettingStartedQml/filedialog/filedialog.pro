@@ -1,7 +1,9 @@
+# 链入 qml 模块，配置为插件(plugin), 使用 lib 模板。
 TEMPLATE = lib
 CONFIG += plugin
 QT += qml
 
+# 将编译后的插件(plugin)放入父目录中的 imports/FileDialog 目录下。
 DESTDIR +=  ../imports/FileDialog
 OBJECTS_DIR = tmp
 MOC_DIR = tmp

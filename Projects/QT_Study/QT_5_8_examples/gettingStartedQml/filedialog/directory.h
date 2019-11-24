@@ -52,6 +52,7 @@
 class Directory : public QObject {
     Q_OBJECT
 
+    // 定义可被 QML 使用的属性。
     // Number of files in the directory
     Q_PROPERTY(int filesCount READ filesCount)
 
@@ -77,6 +78,7 @@ public:
     void setFilename(const QString &str);
     void setFileContent(const QString &str);
 
+    // 定义可被 QML 使用的函数。
     // Accessible from QML
     Q_INVOKABLE void saveFile();
     Q_INVOKABLE void loadFile();

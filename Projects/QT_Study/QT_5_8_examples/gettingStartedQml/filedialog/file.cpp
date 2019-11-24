@@ -53,6 +53,7 @@ void File::setName(const QString &str)
 {
     if (str != m_name) {
         m_name = str;
+        // 使用 emit 来触发信号。
         emit nameChanged();
     }
 }

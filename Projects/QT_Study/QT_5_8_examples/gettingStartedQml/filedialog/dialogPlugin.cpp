@@ -45,6 +45,7 @@
 
 void DialogPlugin::registerTypes(const char *uri)
 {
+    // 将 Directory 和 File 两个类注册导出。
     // Register the class Directory into QML as a "Directory" type version 1.0
     // @uri FileDialog
     qmlRegisterType<Directory>(uri, 1, 0, "Directory");

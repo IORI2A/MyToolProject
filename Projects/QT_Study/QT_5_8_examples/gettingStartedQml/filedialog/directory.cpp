@@ -50,6 +50,7 @@ Directory::Directory(QObject *parent) : QObject(parent)
 {
     m_dir.cd(QDir::currentPath());
 
+    // 构建 Directory 对象时，创建 "saves" 目录。
     // Go to the saved directory. if not found, create it
     m_saveDir = "saves";
     if (m_dir.cd(m_saveDir) == 0) {
@@ -151,6 +152,7 @@ void Directory::setFileContent(const QString &str)
     }
 }
 
+// 文件路径操作，文件开关、读写，流与文件结合操作。
 /*
     Called from QML to save the file using the filename and content.
     Makes sure that the file has a .txt extension.
@@ -203,6 +205,7 @@ void Directory::loadFile()
     file.close();
 }
 
+// 文件目录操作，获取指定类型文件列表。
 /*
     Reloads the content of the files list. This is to ensure
     that the newly created files are added onto the list.
