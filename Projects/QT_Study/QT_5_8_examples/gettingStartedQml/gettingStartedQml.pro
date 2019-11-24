@@ -1,4 +1,6 @@
+# 是一个项目管理集
 TEMPLATE      = subdirs
+# 子项目
 SUBDIRS       = \
                 filedialog\
 
