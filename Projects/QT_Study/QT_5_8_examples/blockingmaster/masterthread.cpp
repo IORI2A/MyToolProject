@@ -82,12 +82,16 @@ void MasterThread::transaction(const QString &portName, int waitTimeout, const Q
     this->request = request;
     //! [3]
     if (!isRunning())
+        // 继承的函数。将调用虚函数 run() 来执行线程。
         start();
     else
+        // 激活等待事件。唤醒在该事件上阻着的线程。
         cond.wakeOne();
 }
 //! [2] //! [3]
 
+// 重写实现虚函数。
+// 线程真正执行的操作内容。
 //! [4]
 void MasterThread::run()
 {
@@ -108,12 +112,15 @@ void MasterThread::run()
     QSerialPort serial;
 
     while (!quit) {
+        // 如果串口端口有改变。关闭旧端口，重新启用新端口。
         //![6] //! [7]
         if (currentPortNameChanged) {
+            // 串口的开关操作。
             serial.close();
             serial.setPortName(currentPortName);
 
             if (!serial.open(QIODevice::ReadWrite)) {
+                // 出错，发起 error 信号。
                 emit error(tr("Can't open %1, error code %2")
                            .arg(portName).arg(serial.error()));
                 return;
@@ -121,26 +128,34 @@ void MasterThread::run()
         }
         //! [7] //! [8]
         // write request
+        // 字符串转字节。
         QByteArray requestData = currentRequest.toLocal8Bit();
         serial.write(requestData);
+        // 等待数据发送完成？
         if (serial.waitForBytesWritten(waitTimeout)) {
             //! [8] //! [10]
             // read response
+            // 等待数据接收完成？
             if (serial.waitForReadyRead(currentWaitTimeout)) {
                 QByteArray responseData = serial.readAll();
                 while (serial.waitForReadyRead(10))
                     responseData += serial.readAll();
 
+                // 字节转字符串。
                 QString response(responseData);
                 //! [12]
+                // 前面使用 emit 关键字，调用信号函数发起信号。 （实质还是调用函数）
+                // 发起 response 信号。
                 emit this->response(response);
                 //! [10] //! [11] //! [12]
             } else {
+                // 接收？超时，发起 timeout 信号。
                 emit timeout(tr("Wait read response timeout %1")
                              .arg(QTime::currentTime().toString()));
             }
             //! [9] //! [11]
         } else {
+            // 发送？超时，发起 timeout 信号。
             emit timeout(tr("Wait write request timeout %1")
                          .arg(QTime::currentTime().toString()));
         }

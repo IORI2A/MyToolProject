@@ -74,6 +74,7 @@ Dialog::Dialog(QWidget *parent)
     , statusLabel(new QLabel(tr("Status: Not running.")))
     , runButton(new QPushButton(tr("Start")))
 {
+    // 获取所有串口？
     const auto infos = QSerialPortInfo::availablePorts();
     for (const QSerialPortInfo &info : infos)
         serialPortComboBox->addItem(info.portName());
@@ -81,11 +82,17 @@ Dialog::Dialog(QWidget *parent)
     waitResponseSpinBox->setRange(0, 10000);
     waitResponseSpinBox->setValue(1000);
 
+    // 创建工程时没有指定生成 .ui 文件。
+    // 直接使用代码来手动创建控件并布局。
+    // MFC 中一般是使用坐标值通过指定控件位置的函数方法来布局。
+    // QT 中提供了更加多的布局方式，如下:
+    // 以单元格(grid)的方式布局。
     auto mainLayout = new QGridLayout;
     mainLayout->addWidget(serialPortLabel, 0, 0);
     mainLayout->addWidget(serialPortComboBox, 0, 1);
     mainLayout->addWidget(waitResponseLabel, 1, 0);
     mainLayout->addWidget(waitResponseSpinBox, 1, 1);
+    // 指定一个控件占多个单元格。相当于 OFFICE 中的合并单元格。
     mainLayout->addWidget(runButton, 0, 2, 2, 1);
     mainLayout->addWidget(requestLabel, 2, 0);
     mainLayout->addWidget(requestLineEdit, 2, 1, 1, 3);
@@ -96,6 +103,7 @@ Dialog::Dialog(QWidget *parent)
     setWindowTitle(tr("Blocking Master"));
     serialPortComboBox->setFocus();
 
+    // 连接源、信号 到 目的地、槽。
     connect(runButton, &QPushButton::clicked, this, &Dialog::transaction);
     connect(&thread, &MasterThread::response, this, &Dialog::showResponse);
     connect(&thread, &MasterThread::error, this, &Dialog::processError);
@@ -107,6 +115,7 @@ void Dialog::transaction()
     setControlsEnabled(false);
     statusLabel->setText(tr("Status: Running, connected to port %1.")
                          .arg(serialPortComboBox->currentText()));
+    // 线程就如此简单的调用起来了么？
     thread.transaction(serialPortComboBox->currentText(),
                        waitResponseSpinBox->value(),
                        requestLineEdit->text());
@@ -115,6 +124,7 @@ void Dialog::transaction()
 void Dialog::showResponse(const QString &s)
 {
     setControlsEnabled(true);
+    // QT 中字符串的格式化输出方式。
     trafficLabel->setText(tr("Traffic, transaction #%1:"
                              "\n\r-request: %2"
                              "\n\r-response: %3")
@@ -135,6 +145,7 @@ void Dialog::processTimeout(const QString &s)
     trafficLabel->setText(tr("No traffic."));
 }
 
+// 置相关控件有效、无效。
 void Dialog::setControlsEnabled(bool enable)
 {
     runButton->setEnabled(enable);

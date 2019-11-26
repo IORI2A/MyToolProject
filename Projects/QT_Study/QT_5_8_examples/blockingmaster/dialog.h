@@ -74,11 +74,13 @@ public:
 
 private slots:
     void transaction();
+    // 界面槽函数仅根据传入参数，进行简单的最终信息显示。
     void showResponse(const QString &s);
     void processError(const QString &s);
     void processTimeout(const QString &s);
 
 private:
+    // 置相关控件有效、无效。
     void setControlsEnabled(bool enable);
 
 private:
@@ -88,6 +90,7 @@ private:
     QLabel *waitResponseLabel;
     QSpinBox *waitResponseSpinBox;
     QLabel *requestLabel;
+    // 请求时的数据内容。
     QLineEdit *requestLineEdit;
     QLabel *trafficLabel;
     QLabel *statusLabel;

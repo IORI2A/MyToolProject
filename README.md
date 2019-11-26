@@ -1,3 +1,18 @@
+**2019-11-26**
+
+1. 想要研究一下 QT 多线程编程，Welcome 页面示例中搜索到示例 Blocking Master Example 。
+- 示例程序位置（D:\Qt\Qt5.8.0\Examples\Qt-5.8\serialport\blockingmaster）。
+- 分析代码相关内容：
+  + 获取串口信息，及串口简单操作。
+  + 直接手动编码创建控件并布局。
+  + 连接源/信号 到 目的地/槽，及信号触发。
+  + 线程的创建运行，及重写实现部分方法。
+  + QT 中字符串的格式化输出方式。
+  + 互斥量（互斥锁）/ 事件的简单使用。
+  + 字节与字符串间的转换。
+- 同时建立一个 BlockingMaster 工程仿写、调测分析。
+  + 全局宏 qDebug 。用于在程序调测输出窗口输出内容。
+
 **2019-11-24**
 
 1. 主要结合帮助文档 Getting Started Programming with Qt Quick 分析示例 gettingStartedQml 源码内容。

@@ -65,6 +65,7 @@ public:
     ~MasterThread();
 
     void transaction(const QString &portName, int waitTimeout, const QString &request);
+    // 继承的虚函数。可重写实现。默认为调用 exec() 退出。
     void run() Q_DECL_OVERRIDE;
 
 signals:
@@ -76,7 +77,9 @@ private:
     QString portName;
     QString request;
     int waitTimeout;
+    // 互斥量。（互斥锁）
     QMutex mutex;
+    // 一个等待事件？
     QWaitCondition cond;
     bool quit;
 };
