@@ -752,6 +752,7 @@ namespace Tool
 		//Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ++++ %s", m_pFuncFileName, m_pFunc);
 		// 强制记录执行调用的函数。顺序调用，不挂起线程，应当不会导致卡顿。
 		Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ++++ %s", m_pFuncFileName, m_pFunc);
+		// Tool::CMyMFCStudyLog 的内部资源需要手动进行释放，避免泄漏。
 	}
 #pragma warning(default: 4996)
 
@@ -798,6 +799,8 @@ namespace Tool
 			Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s [%d clock ticks, %2.1f seconds]"
 				, m_pFuncFileName, m_pFunc, durationTick, durationSec);
 		}
+		// 该类使用 Tool::CMyMFCStudyLog ，可以考虑？？？在析构函数中对 Tool::CMyMFCStudyLog 的内部资源需要手动进行释放，避免泄漏。
+		//Tool::CMyMFCStudyLog::FREE();
 
 		delete [] m_pFuncFileName;
 		delete [] m_pFunc;
@@ -916,7 +919,7 @@ void CTool::DELE_FUN_LOG_CRITICAL_SECTION()
 {
 	if (m_bToolFunLogCriticalSectionInited)
 	{
-		InitializeCriticalSection(&m_toolFunLogCriticalSection);
+		DeleteCriticalSection(&m_toolFunLogCriticalSection);
 		m_bToolFunLogCriticalSectionInited = false;
 	}
 }
@@ -1293,7 +1296,7 @@ void Tool::CMyMFCStudyLog::DELE_MFC_STUDY_LOG_CRITICAL_SECTION()
 {
 	if (m_bMfcStudyLogCriticalSectionInited)
 	{
-		InitializeCriticalSection(&m_mfcStudyLogCriticalSection);
+		DeleteCriticalSection(&m_mfcStudyLogCriticalSection);
 		m_bMfcStudyLogCriticalSectionInited = false;
 	}
 	

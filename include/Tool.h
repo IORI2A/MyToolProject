@@ -157,11 +157,20 @@ namespace Tool // namespace Tool
 		clock_t m_startClock;
 		clock_t m_finishClock;
 	};
+
+	// 为方便调用互斥锁的初始化方法，进行前向声明。  OK。
+	class CMyMFCStudyLog;
+	//void Tool::CMyMFCStudyLog::INIT_MFC_STUDY_LOG_CRITICAL_SECTION();
 } // namespace Tool
+
+// 为方便调用互斥锁的初始化方法，进行前向声明。  这种声明方式是错的。
+//class Tool::CMyMFCStudyLog;
+//void Tool::CMyMFCStudyLog::INIT_MFC_STUDY_LOG_CRITICAL_SECTION();
 
 // 使用宏定义，方便使用 __FILE__, __FUNCTION__ 等宏，并简化编写量。
 //#define TOOL_AUTO_LOG_FUNCTION_INFO() Tool::CMyAutoLogName __myAutoLog(__FILE__, __FUNCTION__, "temp.log")
-#define TOOL_AUTO_LOG_FUNCTION_INFO() Tool::CMyAutoLogName __myAutoLog(__FILE__, __FUNCSIG__, "temp.log")
+// 为保证在增加互斥锁之前的旧代码可不更改即可运行，在调用之前进行互斥锁的初始化。 问题，但没有合适的地方进行自动释放删除？ 
+#define TOOL_AUTO_LOG_FUNCTION_INFO() Tool::CMyMFCStudyLog::INIT_MFC_STUDY_LOG_CRITICAL_SECTION(); Tool::CMyAutoLogName __myAutoLog(__FILE__, __FUNCSIG__, "temp.log")
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////

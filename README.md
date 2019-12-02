@@ -1,3 +1,14 @@
+**2019-12-01**
+
+1. 针对 TOOL_AUTO_LOG_FUNCTION_INFO() 宏方法，使用到 CMyAutoLogName ，其使用到 Tool::CMyMFCStudyLog ，其新增了互斥锁限制。
+- 为保证在增加互斥锁功能之前的旧代码可不更改即可运行，在该宏内实现在调用之前进行互斥锁的初始化。
+- 问题，但没有合适的地方进行自动释放删除？ 
+- 为方便调用互斥锁的初始化方法，需要进行前向声明。
+2. 使用 Tool::CMyMFCStudyLog 会涉及到内部的资源动态分配。
+- 目前 Tool::CMyMFCStudyLog 提供的方式是，对内部资源需要手动进行释放，避免泄漏。
+- 释放方法， Tool::CMyMFCStudyLog::FREE() 。
+3. 修复部分互斥锁（临界区）释放方法内部错误调用成初始化了 ，更改为 DeleteCriticalSection 进行释放。
+
 **2019-11-26**
 
 1. 想要研究一下 QT 多线程编程，Welcome 页面示例中搜索到示例 Blocking Master Example 。
