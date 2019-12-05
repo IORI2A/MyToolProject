@@ -10,7 +10,7 @@ CZkemDevice::CZkemDevice(CWnd* pParentWnd, UINT nID)
 {
 	TOOL_AUTO_LOG_FUNCTION_INFO();
 
-	LPCTSTR lpszWindowName = TEXT("CZkemDevice_Window");
+	LPCTSTR lpszWindowName = TEXT("CZkemDevice_Window_Manual");
 	// Only a subset of the Windows dwStyle flags are supported for CreateControl: 
 	DWORD dwStyle = WS_TABSTOP;
 	RECT rect = {7, 7, 7+18, 7+17};
@@ -25,6 +25,27 @@ CZkemDevice::CZkemDevice(CWnd* pParentWnd, UINT nID)
 		/*, CFile* pPersist = NULL, BOOL bStorage = FALSE, BSTR bstrLicKey = NULL*/);
 }
 
+// 提供自动增长分配控件ID。
+// 粗略查看 winuser.h 中定义最大ID是 #define     OBJID_SYSMENU       ((LONG)0xFFFFFFFF)
+// Resource.h 中一般是以 1000 开始。 为避免冲突自动增长基数初步设定为 0XFFFF (65535)。
+UINT CZkemDevice::m_nStaticAutoID = 0XFFFF;
+// 提供支持默认构造，简化后续使用代码的编写。 默认构造父窗口即为主窗口，控件ID自动增长分配。
+CZkemDevice::CZkemDevice()
+{
+	TOOL_AUTO_LOG_FUNCTION_INFO();
+
+	LPCTSTR lpszWindowName = TEXT("CZkemDevice_Window_Auto");
+	DWORD dwStyle = WS_TABSTOP;
+	RECT rect = {7, 7, 7+18, 7+17};
+	CWnd* pParentWnd = ::AfxGetMainWnd();
+	UINT nID = ++m_nStaticAutoID;
+	m_Zkem1.Create(lpszWindowName, dwStyle, rect, pParentWnd, nID);
+
+	// 进行记录标记，方便用于分析区别。
+	CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL("LPCTSTR lpszWindowName = %s, CWnd* pParentWnd = %08X , UINT nID = %d"
+		, "CZkemDevice_Window_Auto", pParentWnd, nID);
+}
+
 CZkemDevice::~CZkemDevice(void)
 {
 	TOOL_AUTO_LOG_FUNCTION_INFO();
@@ -34,6 +55,11 @@ CZkemDevice::~CZkemDevice(void)
 /////////////////////////////////// CZkemDeviceCommon //////////////////////////////////////////////
 CZkemDeviceCommon::CZkemDeviceCommon(CWnd* pParentWnd, UINT nID)
     : CZkemDevice(pParentWnd, nID)
+{
+	TOOL_AUTO_LOG_FUNCTION_INFO();
+}
+
+CZkemDeviceCommon::CZkemDeviceCommon()
 {
 	TOOL_AUTO_LOG_FUNCTION_INFO();
 }
@@ -173,5 +199,73 @@ void CZkemDeviceCommon::GetLastError(long * dwErrorCode)
 	m_Zkem1.GetLastError(dwErrorCode);
 }
 
+BOOL CZkemDeviceCommon::SetUserInfo(long dwMachineNumber, long dwEnrollNumber, LPCTSTR Name, LPCTSTR Password, long Privilege, BOOL Enabled)
+{
+	TOOL_AUTO_LOG_FUNCTION_INFO();
 
+	BOOL ret = FALSE;
 
+	// 该方法接口对于各种设备类型不一致，该类不实现，由具体子类实现。
+	CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL("SetUserInfo 方法接口对于各种设备类型不一致，该类不实现，由子类实现。");
+	ASSERT(false);
+
+	return ret;
+}
+
+BOOL CZkemDeviceCommon::ClearKeeperData(long dwMachineNumber)
+{
+	TOOL_AUTO_LOG_FUNCTION_INFO();
+
+	BOOL ret = m_Zkem1.ClearKeeperData(dwMachineNumber);
+
+	return ret;
+}
+
+BOOL CZkemDeviceCommon::RefreshData(long dwMachineNumber)
+{
+	TOOL_AUTO_LOG_FUNCTION_INFO();
+
+	BOOL ret = m_Zkem1.RefreshData(dwMachineNumber);
+
+	return ret;
+}
+
+BOOL CZkemDeviceCommon::SetStrCardNumber(LPCTSTR ACardNumber)
+{
+	TOOL_AUTO_LOG_FUNCTION_INFO();
+
+	BOOL ret = m_Zkem1.SetStrCardNumber(ACardNumber);
+
+	return ret;
+}
+
+BOOL CZkemDeviceCommon::EnableDevice(long dwMachineNumber, BOOL bFlag)
+{
+	TOOL_AUTO_LOG_FUNCTION_INFO();
+
+	BOOL ret = m_Zkem1.EnableDevice(dwMachineNumber, bFlag);
+
+	return ret;
+}
+
+BOOL CZkemDeviceCommon::ReadAllUserID(long dwMachineNumber)
+{
+	TOOL_AUTO_LOG_FUNCTION_INFO();
+
+	BOOL ret = m_Zkem1.ReadAllUserID(dwMachineNumber);
+
+	return ret;
+}
+
+BOOL CZkemDeviceCommon::GetAllUserInfo(long dwMachineNumber, long * dwEnrollNumber, BSTR * Name, BSTR * Password, long * Privilege, BOOL * Enabled)
+{
+	TOOL_AUTO_LOG_FUNCTION_INFO();
+
+	BOOL ret = FALSE;
+
+	// 该方法接口对于各种设备类型不一致，该类不实现，由具体子类实现。
+	CTool::LOG_TO_DEFAULT_FILE_FORMAT_STR_ENDL("GetAllUserInfo 方法接口对于各种设备类型不一致，该类不实现，由子类实现。");
+	ASSERT(false);
+
+	return ret;
+}

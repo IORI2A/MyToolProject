@@ -252,6 +252,62 @@ namespace Tool // namespace Tool
 #define TOOL_SET_MFC_DLL_STATUS(status)    Tool::CMyMFCStudyLog::SET_MFC_DLL_STATUS(status, __FILE__, __LINE__, __FUNCTION__, "temp.log")
 
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+namespace Tool // namespace Tool
+{
+	// VC++ 使用 _bstr_t 来封装 BSTR 。 comutil.h
+	// 提供 BSTR 的相关操作（构建、赋值、附加、脱离、提取长度、提取地址等） ，以及与 wchar_t 及 char 之间的转换。
+	// _bstr_t 实现 BSTR 与 wchar_t 及 char 之间的转换是通过 _com_util::ConvertBSTRToString 来实现的。
+	// 有关详情参考 MSDN 中 Compiler COM Support 。
+
+	// BSTR 是一种复合类型(composite data type)，属于 COM 组件自动化技术(Automation)范畴。
+	// 参考 MSDN : Win32 and COM Development > Component Development > Automation > SDK Documentation > Automation Programming Reference 
+	// BSTR 如果需要己方释放，请记住调用 SysFreeString 。 MSDN : String Manipulation Functions 。
+	// BSTR 是零结尾字符串(strings are zero-terminated)，但内部是 Unicode 字符 (wide or double-byte characters)。 其地址指向就是字符（二进制数据）的首地址，未尾有结束符（two null characters (0x00)）
+	// typedef OLECHAR FAR * BSTR;
+	// typedef WCHAR  OLECHAR;
+	// 大多数据情况下可被视作宽字符串 (in most cases they can be treated just like OLECHAR* strings)。也即可以直接用于需要宽字符串的地方！？
+	// 推断 BSTR 的结构：
+	// | Length prefix(32-bit integer) | Data string | Terminator(two null characters, 0x0000) |
+	//                                  ^
+	//                                  |
+	// |                                BSTR地址指向                                           |
+	// BSTR 根据机器结构不同，表示也不同。
+	// In 32-bit OLE, BSTRs use Unicode like all other strings in 32-bit OLE. In 16-bit OLE, BSTRs use ANSI. Win32 provides MultiByteToWideChar and WideCharToMultiByte to convert ANSI strings to Unicode, and Unicode strings to ANSI. 
+	// the preferred method of passing binary data is to use a SAFEARRAY of VT_UI1. 
+
+
+	// BSTR、char*和CString转换
+	// https://blog.csdn.net/zeuskaaba/article/details/4082826
+
+	// char/wchar 与 CString 转换。 （这一个使用比较多不再列出）
+
+	// BSTR 与 char 转换。
+	// 方法一，使用 _com_util::ConvertBSTRToString 、 _com_util::ConvertStringToBSTR 。
+	// 方法二，使用 _bstr_t 。
+	// 方法三，仅提供 char 转换成 BSTR ，SysAllocStringByteLen("Test",4); 。 SysAllocString(L"Test");  SysAllocStringLen(L"Test",4);  ::
+	// 方法四，仅提供 char 转换成 BSTR , COleVariant 或 _variant_t 。
+		//COleVariant strVar("This is a test");
+		//_variant_t strVar("This is a test");
+		//BSTR bstrText = strVar.bstrVal; 
+	// 方法四，使用 CComBSTR。（ ATL 使用相对较少）
+
+	// BSTR 与 wchar 转换。
+	// 方法一，使用 _bstr_t 。
+	// 方法二，仅提供 wchar 转换成 BSTR ，SysAllocString(L"Test");  SysAllocStringLen(L"Test",4);  。 
+
+	// BSTR 与 CString 转换。
+	// CString 提供 CStringT::AllocSysString (请记住调用 SysFreeString 释放。) 、 CStringT构造\赋值函数(经调测是 CStringT::CStringT(const XCHAR* pszSrc);) 来实现。
+		//BSTR bstrText = ::SysAllocString(L"Test");	
+		//CString str(bstrText); // CString::CStringT(const XCHAR* pszSrc); BSTR 内部是 Unicode 字符 (wide or double-byte characters)。 可直接转换地址为 whcar* ？？？经调测 BSTR 地址与传参后 XCHAR* 地址相同。
+		//str = bstrText; 
+
+	// Unicode 与 ANSI 转换。
+	// win32 系统提供使用 MultiByteToWideChar 、 WideCharToMultiByte 。
+	// 参考 MSDN : Win32 and COM Development > User Interface > International > SDK Documentation > International Text Display > Unicode and Character Sets
+
+
+} // namespace Tool
 
 
 #endif /*__TOOL_H__*/

@@ -8,8 +8,8 @@
 
 
 #include "Tool.h"
-#include "ZkemDeviceBW.h"
-#include "ZkemDeviceTFT.h"
+#include "ZkemDeviceMA300.h"
+#include "ZkemDeviceF20PLUS.h"
 
 
 
@@ -58,6 +58,7 @@ END_MESSAGE_MAP()
 CTestDlgDlg::CTestDlgDlg(CWnd* pParent /*=NULL*/)
 	: CDialog(CTestDlgDlg::IDD, pParent)
 	, m_pZkemDevice(NULL)
+	, m_pDialogAboutUserInfo(NULL)
 {
 	m_hIcon = AfxGetApp()->LoadIcon(IDR_MAINFRAME);
 }
@@ -65,8 +66,17 @@ CTestDlgDlg::CTestDlgDlg(CWnd* pParent /*=NULL*/)
 CTestDlgDlg::~CTestDlgDlg()
 {
 	// 释放动态分配的资源。
-	delete m_pZkemDevice;
-	m_pZkemDevice = NULL;
+	if (m_pZkemDevice)
+	{
+		delete m_pZkemDevice;
+		m_pZkemDevice = NULL;
+	}
+
+	if (m_pDialogAboutUserInfo)
+	{
+		delete m_pDialogAboutUserInfo;
+		m_pDialogAboutUserInfo = NULL;
+	}
 }
 
 void CTestDlgDlg::DoDataExchange(CDataExchange* pDX)
@@ -95,6 +105,12 @@ BEGIN_MESSAGE_MAP(CTestDlgDlg, CDialog)
 	ON_BN_CLICKED(IDC_BUTTON_GET_DEVICE_IP, &CTestDlgDlg::OnBnClickedButtonGetDeviceIp)
 	ON_BN_CLICKED(IDC_BUTTON_SET_USER_GROUP, &CTestDlgDlg::OnBnClickedButtonSetUserGroup)
 	ON_BN_CLICKED(IDC_BUTTON_SET_USER_INFO, &CTestDlgDlg::OnBnClickedButtonSetUserInfo)
+	ON_BN_CLICKED(IDC_BUTTON_CLEAR_KEEPER_DATA, &CTestDlgDlg::OnBnClickedButtonClearKeeperData)
+	ON_BN_CLICKED(IDC_BUTTON_REFRESH_DATA, &CTestDlgDlg::OnBnClickedButtonRefreshData)
+	ON_BN_CLICKED(IDC_BUTTON_SET_STR_CARD_NUMBER, &CTestDlgDlg::OnBnClickedButtonSetStrCardNumber)
+	ON_BN_CLICKED(IDC_BUTTON_ENABLE_DEVICE_TRUE, &CTestDlgDlg::OnBnClickedButtonEnableDeviceTrue)
+	ON_BN_CLICKED(IDC_BUTTON_ENABLE_DEVICE_FALSE, &CTestDlgDlg::OnBnClickedButtonEnableDeviceFalse)
+	ON_BN_CLICKED(IDC_BUTTON_ABOUT_USER_INFO, &CTestDlgDlg::OnBnClickedButtonAboutUserInfo)
 END_MESSAGE_MAP()
 
 
@@ -131,10 +147,10 @@ BOOL CTestDlgDlg::OnInitDialog()
 
 	// TODO: 在此添加额外的初始化代码
 	// 使用新的运用继承和动态绑定的ZK设备类体系。
-	// BW 设备
-	m_pZkemDevice = new CZkemDeviceBW(this, 1810001);
-	//// TFT 设备
-	//m_pZkemDevice = new CZkemDeviceTFT(this, 1810002);
+	//// BW 设备
+	//m_pZkemDevice = new CZkemDeviceMA300();
+	// TFT 设备
+	m_pZkemDevice = new CZkemDeviceF20PLUS();
 
 	return TRUE;  // 除非将焦点设置到控件，否则返回 TRUE
 }
@@ -202,7 +218,7 @@ void CTestDlgDlg::OnBnClickedButtonConnectNet()
 
 	clock_t start = clock();
 
-	BOOL res = m_pZkemDevice->Connect_Net(TEXT("192.168.100.10"), 4370);
+	BOOL res = m_pZkemDevice->Connect_Net(TEXT("192.168.100.131"), 4370);
 	DisplayLastErrorInfor();
 
 	clock_t finish = clock();
@@ -1072,6 +1088,43 @@ void CTestDlgDlg::DisplayLastErrorInfor()
 	}
 }
 
+void CTestDlgDlg::OnBnClickedButtonSetStrCardNumber()
+{
+	{
+		wchar_t buffer[512] = {};
+		wsprintf(buffer,  TEXT("%s 开始对设备进行 设置SDK属性cardnumber的值，一般在设置用户信息前用该函数设置相应用户的卡号信息 操作！\r\n"), CTool::GET_W_LOCAL_CURRENT_TIME());
+		m_EditMsg.ReplaceSel(buffer);
+	}
+
+	clock_t start = clock();
+
+	LPCTSTR ACardNumber = TEXT("12");
+	//LPCTSTR ACardNumber = TEXT("13");
+	//LPCTSTR ACardNumber = TEXT("15");
+	BOOL res = m_pZkemDevice->SetStrCardNumber(ACardNumber);
+	if (FALSE == res)
+	{
+		DisplayLastErrorInfor();
+	}
+
+	clock_t finish = clock();
+	clock_t durationTick = finish - start;
+	double durationSec = (double)(finish - start) / CLOCKS_PER_SEC;
+
+	{
+		wchar_t buffer[512] = {};
+		swprintf(buffer, sizeof(buffer)/sizeof(wchar_t),  TEXT("%s 设置SDK属性cardnumber的值，一般在设置用户信息前用该函数设置相应用户的卡号信息 操作完成，返回 BOOL res = %d ！ [%d clock ticks, %f seconds]\r\n")
+			, CTool::GET_W_LOCAL_CURRENT_TIME(), res, durationTick, durationSec);
+		m_EditMsg.ReplaceSel(buffer);
+	}
+	{
+		wchar_t buffer[512] = {};
+		wsprintf(buffer,  TEXT("%s ACardNumber = %s \r\n")
+			, CTool::GET_W_LOCAL_CURRENT_TIME(), ACardNumber);
+		m_EditMsg.ReplaceSel(buffer);
+	}
+}
+
 void CTestDlgDlg::OnBnClickedButtonSetUserInfo()
 {
 	{
@@ -1081,9 +1134,19 @@ void CTestDlgDlg::OnBnClickedButtonSetUserInfo()
 	}
 
 	long dwMachineNumber = 1;
-	long dwEnrollNumber = 11;
-	LPCTSTR Name  = TEXT("张世雅典娜");
-	LPCTSTR Password  = TEXT("");
+
+	//long dwEnrollNumber = 11;
+	//LPCTSTR Name  = TEXT("张世雅典娜");
+	long dwEnrollNumber = 12;
+	LPCTSTR Name  = TEXT("abcdefghijklmnopqrstuvwxyz");
+	//long dwEnrollNumber = 13;
+	//LPCTSTR Name  = TEXT("1234567890");
+	//long dwEnrollNumber = 14;
+	//LPCTSTR Name  = TEXT("12345678");
+	//long dwEnrollNumber = 15;
+	//LPCTSTR Name  = TEXT("123456");
+
+	LPCTSTR Password  = TEXT("123456");
 	long Privilege = 3;
 	BOOL Enabled = 1;
 
@@ -1094,7 +1157,10 @@ void CTestDlgDlg::OnBnClickedButtonSetUserInfo()
 	// 新架构：0为普通用户，1，2,4为自定义用户角色，3超级管理员。
 	// Enable参数代表用户是否启用，1为启用，0为禁用。 
 	BOOL res = m_pZkemDevice->SetUserInfo(dwMachineNumber, dwEnrollNumber, Name, Password, Privilege, Enabled);
-	DisplayLastErrorInfor();
+	if (FALSE == res)
+	{
+		DisplayLastErrorInfor();
+	}
 
 	clock_t finish = clock();
 	clock_t durationTick = finish - start;
@@ -1112,4 +1178,152 @@ void CTestDlgDlg::OnBnClickedButtonSetUserInfo()
 			, CTool::GET_W_LOCAL_CURRENT_TIME(), dwEnrollNumber, Name, Password, Privilege, Enabled);
 		m_EditMsg.ReplaceSel(buffer);
 	}
+}
+
+
+void CTestDlgDlg::OnBnClickedButtonClearKeeperData()
+{
+	{
+		wchar_t buffer[512] = {};
+		wsprintf(buffer,  TEXT("%s 开始对设备进行 清楚机器内所有的数据 操作！\r\n"), CTool::GET_W_LOCAL_CURRENT_TIME());
+		m_EditMsg.ReplaceSel(buffer);
+	}
+
+	clock_t start = clock();
+
+	long dwMachineNumber = 1;
+	BOOL res = m_pZkemDevice->ClearKeeperData(dwMachineNumber);
+	if (FALSE == res)
+	{
+		DisplayLastErrorInfor();
+	}
+
+	clock_t finish = clock();
+	clock_t durationTick = finish - start;
+	double durationSec = (double)(finish - start) / CLOCKS_PER_SEC;
+
+	{
+		wchar_t buffer[512] = {};
+		swprintf(buffer, sizeof(buffer)/sizeof(wchar_t),  TEXT("%s 清楚机器内所有的数据 操作完成，返回 BOOL res = %d ！ [%d clock ticks, %f seconds]\r\n")
+			, CTool::GET_W_LOCAL_CURRENT_TIME(), res, durationTick, durationSec);
+		m_EditMsg.ReplaceSel(buffer);
+	}
+}
+
+
+void CTestDlgDlg::OnBnClickedButtonRefreshData()
+{
+	{
+		wchar_t buffer[512] = {};
+		wsprintf(buffer,  TEXT("%s 开始对设备进行 刷新机器内数据，使所作的修改立即起作用 操作！\r\n"), CTool::GET_W_LOCAL_CURRENT_TIME());
+		m_EditMsg.ReplaceSel(buffer);
+	}
+
+	clock_t start = clock();
+
+	long dwMachineNumber = 1;
+	BOOL res = m_pZkemDevice->RefreshData(dwMachineNumber);
+	if (FALSE == res)
+	{
+		DisplayLastErrorInfor();
+	}
+
+	clock_t finish = clock();
+	clock_t durationTick = finish - start;
+	double durationSec = (double)(finish - start) / CLOCKS_PER_SEC;
+
+	{
+		wchar_t buffer[512] = {};
+		swprintf(buffer, sizeof(buffer)/sizeof(wchar_t),  TEXT("%s 刷新机器内数据，使所作的修改立即起作用 操作完成，返回 BOOL res = %d ！ [%d clock ticks, %f seconds]\r\n")
+			, CTool::GET_W_LOCAL_CURRENT_TIME(), res, durationTick, durationSec);
+		m_EditMsg.ReplaceSel(buffer);
+	}
+}
+
+
+
+
+void CTestDlgDlg::OnBnClickedButtonEnableDeviceTrue()
+{
+	// 启用或者禁用机器，禁用即意味着关闭指纹头，键盘，卡模块等
+
+	{
+		wchar_t buffer[512] = {};
+		wsprintf(buffer,  TEXT("%s 开始对设备进行 启用机器 操作！\r\n"), CTool::GET_W_LOCAL_CURRENT_TIME());
+		m_EditMsg.ReplaceSel(buffer);
+	}
+
+	clock_t start = clock();
+
+	long dwMachineNumber = 1;
+	BOOL bFlag = TRUE;
+	BOOL res = m_pZkemDevice->EnableDevice(dwMachineNumber, bFlag);
+	if (FALSE == res)
+	{
+		DisplayLastErrorInfor();
+	}
+
+	clock_t finish = clock();
+	clock_t durationTick = finish - start;
+	double durationSec = (double)(finish - start) / CLOCKS_PER_SEC;
+
+	{
+		wchar_t buffer[512] = {};
+		swprintf(buffer, sizeof(buffer)/sizeof(wchar_t),  TEXT("%s 启用机器 操作完成，返回 BOOL res = %d ！ [%d clock ticks, %f seconds]\r\n")
+			, CTool::GET_W_LOCAL_CURRENT_TIME(), res, durationTick, durationSec);
+		m_EditMsg.ReplaceSel(buffer);
+	}
+	{
+		wchar_t buffer[512] = {};
+		wsprintf(buffer,  TEXT("%s bFlag = %d \r\n")
+			, CTool::GET_W_LOCAL_CURRENT_TIME(), bFlag);
+		m_EditMsg.ReplaceSel(buffer);
+	}
+}
+
+
+void CTestDlgDlg::OnBnClickedButtonEnableDeviceFalse()
+{
+	// 启用或者禁用机器，禁用即意味着关闭指纹头，键盘，卡模块等
+
+	{
+		wchar_t buffer[512] = {};
+		wsprintf(buffer,  TEXT("%s 开始对设备进行 禁用机器 操作！\r\n"), CTool::GET_W_LOCAL_CURRENT_TIME());
+		m_EditMsg.ReplaceSel(buffer);
+	}
+	clock_t start = clock();
+
+	long dwMachineNumber = 1;
+	BOOL bFlag = FALSE;
+	BOOL res = m_pZkemDevice->EnableDevice(dwMachineNumber, bFlag);
+	if (FALSE == res)
+	{
+		DisplayLastErrorInfor();
+	}
+
+	clock_t finish = clock();
+	clock_t durationTick = finish - start;
+	double durationSec = (double)(finish - start) / CLOCKS_PER_SEC;
+	{
+		wchar_t buffer[512] = {};
+		swprintf(buffer, sizeof(buffer)/sizeof(wchar_t),  TEXT("%s 禁用机器 操作完成，返回 BOOL res = %d ！ [%d clock ticks, %f seconds]\r\n")
+			, CTool::GET_W_LOCAL_CURRENT_TIME(), res, durationTick, durationSec);
+		m_EditMsg.ReplaceSel(buffer);
+	}
+	{
+		wchar_t buffer[512] = {};
+		wsprintf(buffer,  TEXT("%s bFlag = %d \r\n")
+			, CTool::GET_W_LOCAL_CURRENT_TIME(), bFlag);
+		m_EditMsg.ReplaceSel(buffer);
+	}
+}
+
+void CTestDlgDlg::OnBnClickedButtonAboutUserInfo()
+{
+	//CDialogAboutUserInfo dialog;
+	//dialog.DoModal();
+
+	m_pDialogAboutUserInfo = new CDialogAboutUserInfo;
+	m_pDialogAboutUserInfo->Create(IDD_DIALOG_ABOUT_USER_INFO, this);
+	m_pDialogAboutUserInfo->ShowWindow(SW_SHOW);
 }

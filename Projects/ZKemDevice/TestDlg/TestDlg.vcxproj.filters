@@ -24,9 +24,6 @@
     <ClCompile Include="TestDlgDlg.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\MyToolProject\src\Tool.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="ZkDevice.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
@@ -40,6 +37,21 @@
       <Filter>源文件</Filter>
     </ClCompile>
     <ClCompile Include="ZkemDeviceTFT.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="E:\LZ\test\MyToolProject\src\Tool.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ZkemDeviceF20PLUS.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="ZkemDeviceMA300.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="UseZkemDevice.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="DialogAboutUserInfo.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
@@ -59,9 +71,6 @@
     <ClInclude Include="TestDlgDlg.h">
       <Filter>头文件</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\MyToolProject\include\Tool.h">
-      <Filter>头文件</Filter>
-    </ClInclude>
     <ClInclude Include="ZkDevice.h">
       <Filter>头文件</Filter>
     </ClInclude>
@@ -75,6 +84,18 @@
       <Filter>头文件</Filter>
     </ClInclude>
     <ClInclude Include="ZkemDeviceTFT.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="E:\LZ\test\MyToolProject\include\Tool.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ZkemDeviceF20PLUS.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="ZkemDeviceMA300.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="DialogAboutUserInfo.h">
       <Filter>头文件</Filter>
     </ClInclude>
   </ItemGroup>

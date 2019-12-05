@@ -31,6 +31,12 @@ protected:
 public:
 	virtual ~CZkemDevice(void);
 
+protected:
+	// 提供自动增长分配控件ID。
+	static UINT m_nStaticAutoID;
+	// 提供支持默认构造，简化后续使用代码的编写。 默认构造父窗口即为主窗口，控件ID自动增长分配。
+	CZkemDevice();
+
 //private:
 protected:
 	// 机器是否为彩屏机
@@ -54,7 +60,12 @@ public:
 	virtual BOOL SetUserGroup(long dwMachineNumber, long dwEnrollNumber, long UserGrp) = 0;
 	virtual void GetLastError(long * dwErrorCode) = 0;
 	virtual BOOL SetUserInfo(long dwMachineNumber, long dwEnrollNumber, LPCTSTR Name, LPCTSTR Password, long Privilege, BOOL Enabled) = 0;
-
+	virtual BOOL ClearKeeperData(long dwMachineNumber) = 0;
+	virtual BOOL RefreshData(long dwMachineNumber) = 0;
+	virtual BOOL SetStrCardNumber(LPCTSTR ACardNumber) = 0;
+	virtual BOOL EnableDevice(long dwMachineNumber, BOOL bFlag) = 0;
+	virtual BOOL ReadAllUserID(long dwMachineNumber) = 0;
+	virtual BOOL GetAllUserInfo(long dwMachineNumber, long * dwEnrollNumber, BSTR * Name, BSTR * Password, long * Privilege, BOOL * Enabled) = 0;
 };
 
 // CZkemDeviceCommon 实现 BW,TFT,IFACE 等不同设备的同名称接口。
@@ -62,6 +73,7 @@ class CZkemDeviceCommon : public CZkemDevice
 {
 protected:
 	CZkemDeviceCommon(CWnd* pParentWnd, UINT nID);
+	CZkemDeviceCommon();
 	~CZkemDeviceCommon(void);
 
 public:
@@ -80,4 +92,11 @@ public:
 	BOOL GetDeviceIP(long dwMachineNumber, BSTR * IPAddr);
 	BOOL SetUserGroup(long dwMachineNumber, long dwEnrollNumber, long UserGrp);
 	void GetLastError(long * dwErrorCode);
+	BOOL SetUserInfo(long dwMachineNumber, long dwEnrollNumber, LPCTSTR Name, LPCTSTR Password, long Privilege, BOOL Enabled);
+	BOOL ClearKeeperData(long dwMachineNumber);
+	BOOL RefreshData(long dwMachineNumber);
+	BOOL SetStrCardNumber(LPCTSTR ACardNumber);
+	BOOL EnableDevice(long dwMachineNumber, BOOL bFlag);
+	BOOL ReadAllUserID(long dwMachineNumber);
+	BOOL GetAllUserInfo(long dwMachineNumber, long * dwEnrollNumber, BSTR * Name, BSTR * Password, long * Privilege, BOOL * Enabled);
 };

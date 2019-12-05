@@ -8,6 +8,7 @@
 #include "afxwin.h"
 
 #include "ZkemDevice.h"
+#include "DialogAboutUserInfo.h"
 
 
 // CTestDlgDlg ¶Ô»°¿ò
@@ -56,4 +57,12 @@ public:
 
 	void DisplayLastErrorInfor();
 	afx_msg void OnBnClickedButtonSetUserInfo();
+	afx_msg void OnBnClickedButtonClearKeeperData();
+	afx_msg void OnBnClickedButtonRefreshData();
+	afx_msg void OnBnClickedButtonSetStrCardNumber();
+	afx_msg void OnBnClickedButtonEnableDeviceTrue();
+	afx_msg void OnBnClickedButtonEnableDeviceFalse();
+	afx_msg void OnBnClickedButtonAboutUserInfo();
+private:
+	CDialogAboutUserInfo *m_pDialogAboutUserInfo;
 };

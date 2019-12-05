@@ -119,6 +119,7 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DialogAboutUserInfo.cpp" />
     <ClCompile Include="stdafx.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -131,13 +132,17 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
       </PrecompiledHeader>
     </ClCompile>
+    <ClCompile Include="UseZkemDevice.cpp" />
     <ClCompile Include="ZkDevice.cpp" />
     <ClCompile Include="zkem1.cpp" />
     <ClCompile Include="ZkemDevice.cpp" />
     <ClCompile Include="ZkemDeviceBW.cpp" />
+    <ClCompile Include="ZkemDeviceF20PLUS.cpp" />
+    <ClCompile Include="ZkemDeviceMA300.cpp" />
     <ClCompile Include="ZkemDeviceTFT.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DialogAboutUserInfo.h" />
     <ClInclude Include="Resource.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="targetver.h" />
@@ -148,6 +153,8 @@
     <ClInclude Include="zkem1.h" />
     <ClInclude Include="ZkemDevice.h" />
     <ClInclude Include="ZkemDeviceBW.h" />
+    <ClInclude Include="ZkemDeviceF20PLUS.h" />
+    <ClInclude Include="ZkemDeviceMA300.h" />
     <ClInclude Include="ZkemDeviceTFT.h" />
   </ItemGroup>
   <ItemGroup>

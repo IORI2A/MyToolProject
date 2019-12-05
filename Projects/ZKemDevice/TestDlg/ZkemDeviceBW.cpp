@@ -11,6 +11,11 @@ CZkemDeviceBW::CZkemDeviceBW(CWnd* pParentWnd, UINT nID)
 	TOOL_AUTO_LOG_FUNCTION_INFO();
 }
 
+CZkemDeviceBW::CZkemDeviceBW()
+{
+	TOOL_AUTO_LOG_FUNCTION_INFO();
+}
+
 CZkemDeviceBW::~CZkemDeviceBW(void)
 {
 	TOOL_AUTO_LOG_FUNCTION_INFO();
@@ -20,7 +25,7 @@ BOOL CZkemDeviceBW::SetUserInfo(long dwMachineNumber, long dwEnrollNumber, LPCTS
 {
 	TOOL_AUTO_LOG_FUNCTION_INFO();
 
-	BOOL ret = ret = m_Zkem1.SetUserInfo(dwMachineNumber, dwEnrollNumber, Name, Password, Privilege, Enabled);
+	BOOL ret = m_Zkem1.SetUserInfo(dwMachineNumber, dwEnrollNumber, Name, Password, Privilege, Enabled);
 
-	return FALSE;
+	return ret;
 }

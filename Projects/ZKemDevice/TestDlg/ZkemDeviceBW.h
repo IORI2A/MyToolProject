@@ -6,6 +6,7 @@ class CZkemDeviceBW :
 {
 public:
 	CZkemDeviceBW(CWnd* pParentWnd, UINT nID);
+	CZkemDeviceBW();
 	~CZkemDeviceBW(void);
 
 public:
