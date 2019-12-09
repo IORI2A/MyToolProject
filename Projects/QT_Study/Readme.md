@@ -57,3 +57,10 @@ QT_Study_2
   + 互斥量（互斥锁）/ 事件的简单使用。
   + 字节与字符串间的转换。
 - 全局宏 qDebug 。用于在程序调测输出窗口输出内容。
+
+**Books 示例**
+- 演示 Qt SQL 类与 QT model/view 框架结合创建带GUI显示操作数据库。
+- 使用 SQLITE 数据库。
+
+**ConToMysql_Console**
+- 探索 QT 连接访问 MSSQL 。

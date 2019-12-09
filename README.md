@@ -1,3 +1,8 @@
+**2019-12-09**
+1. QT 技术暂时停用，研究到目前暂停学习。
+- Books 示例。演示 Qt SQL 类与 QT model/view 框架结合使用。数据库 SQLITE 。
+- ConToMysql_Console 探索 QT 连接访问 MSSQL 。
+
 **2019-12-05**
 1. BUG 修复
 - CZkemDeviceBW::SetUserInfo 和 CZkemDeviceTFT::SetUserInfo 返回值一直为 0 问题。
