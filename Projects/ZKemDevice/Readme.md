@@ -1,3 +1,12 @@
+**构建一个命令行脚本 删除不需要归档的文件。**
+
+**搜索： bat 清理工程项目**
+- [如何用.bat文件清理工程目录](http://www.voidcn.com/article/p-moxwkywz-vo.html)
+  + **搜索： bat for**
+    - [bat(续七)-for语句(循环结构)](https://www.cnblogs.com/lm002003/archive/2012/05/15/2502439.html)
+
+
+
 **一个用于调测ZK不同型号门禁设备的DEMO示例。**
 - 中控ZKEM控件自动生成 CZkem1 源码。
 - 在中控ZKEM控件上进行一层封装，方便后续扩展添加内容。
