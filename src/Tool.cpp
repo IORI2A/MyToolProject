@@ -67,6 +67,8 @@ void CTool::LOG_ENDL(const wchar_t *file, const wchar_t *str)
 char CTool::m_staticCharCurrentTimeBuffer[128] = {};
 const char * CTool::GET_CURRENT_TIME(const char *format)
 {
+	// struct tm 就没有毫秒字段。所以相关系列的函数操作无法打印毫秒信息。
+
 	time_t rawtime;
 	struct tm * timeinfo;
 
@@ -96,6 +98,8 @@ const wchar_t * CTool::GET_CURRENT_TIME(const wchar_t *format)
 
 const char * CTool::GET_LOCAL_CURRENT_TIME()
 {
+	// SYSTEMTIME st 有毫秒字段。可支持毫秒输出。
+
 	SYSTEMTIME st;
 	// 本地时间 LocalTime 本地时间会根据机器设置的时区，将系统时间进行调整以适合本地时区。
 	GetLocalTime(&st);

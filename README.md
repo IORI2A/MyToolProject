@@ -1,3 +1,11 @@
+**2019-12-14**
+1. 学习使用 Xamarin 开发 Android 。
+- Xamarin.Android 开发学习，官方示例 Phoneword 。
+- 官方参考 [Xamarin.Android](https://docs.microsoft.com/en-us/xamarin/android/)
+2. 分析时间函数是否支持毫秒。
+- struct tm 没有毫秒字段。所以C系列的函数操作无法打印毫秒信息。
+- SYSTEMTIME st 有毫秒字段。可支持毫秒输出。Windows系统函数。
+
 **2019-12-09**
 1. QT 技术暂时停用，研究到目前暂停学习。
 - Books 示例。演示 Qt SQL 类与 QT model/view 框架结合使用。数据库 SQLITE 。

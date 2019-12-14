@@ -98,6 +98,8 @@ private:
 	static char m_staticCharCurrentTimeBuffer[128];
 	static wchar_t m_staticWCharCurrentTimeBuffer[128];
 public:
+	// struct tm 没有毫秒字段。所以C系列的函数操作无法打印毫秒信息。
+	// SYSTEMTIME st 有毫秒字段。可支持毫秒输出。Windows系统函数。
 	//static std::string GET_CURRENT_TIME(const char *format);
 	static const char * GET_CURRENT_TIME(const char *format);
 	static const wchar_t * GET_CURRENT_TIME(const wchar_t *format);
