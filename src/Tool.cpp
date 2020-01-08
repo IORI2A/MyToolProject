@@ -763,6 +763,30 @@ namespace Tool
 		Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ++++ %s", m_pFuncFileName, m_pFunc);
 		// Tool::CMyMFCStudyLog 的内部资源需要手动进行释放，避免泄漏。
 	}
+
+	// 提供一个简版的仅记录函数名称信息的接口
+	CMyAutoLogName::CMyAutoLogName(const char *func, const char *logFie)
+		: m_pFuncFileName(NULL), m_line(0), m_pFunc(new char[m_pFuncLen]()), m_pLogFile(new char[m_pLogFileLen]())
+		, m_startClock(0), m_finishClock(0)
+	{
+		m_startClock = clock();  // 记录开始时的时钟
+
+		if(logFie)
+		{
+			strcpy(m_pLogFile, logFie);
+		}
+		else
+		{
+			strcpy(m_pLogFile, "temp.log");
+		}
+
+		if(func)
+		{
+			strcpy(m_pFunc, func);
+		}
+
+		Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "++++ %s", m_pFunc);
+	}
 #pragma warning(default: 4996)
 
 
@@ -790,23 +814,40 @@ namespace Tool
 
 		if (m_line)
 		{
-			//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s [%d clock ticks, %2.1f seconds]"
-			//	, m_pFuncFileName, m_line, m_pFunc, durationTick, durationSec);
-			// 改用速度更快的实现。
-			//Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s [%d clock ticks, %2.1f seconds]"
-			//	, m_pFuncFileName, m_line, m_pFunc, durationTick, durationSec);
-			// 强制记录执行调用的函数。顺序调用，不挂起线程，应当不会导致卡顿。
-			Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s [%d clock ticks, %2.1f seconds]"
-				, m_pFuncFileName, m_line, m_pFunc, durationTick, durationSec);
+			// 需要判定是否需要输出文件位置名信息
+			if (m_pFuncFileName)
+			{
+				//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s [%d clock ticks, %2.1f seconds]"
+				//	, m_pFuncFileName, m_line, m_pFunc, durationTick, durationSec);
+				// 改用速度更快的实现。
+				//Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s [%d clock ticks, %2.1f seconds]"
+				//	, m_pFuncFileName, m_line, m_pFunc, durationTick, durationSec);
+				// 强制记录执行调用的函数。顺序调用，不挂起线程，应当不会导致卡顿。
+				Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s(%d): ---- %s [%d clock ticks, %2.1f seconds]"
+					, m_pFuncFileName, m_line, m_pFunc, durationTick, durationSec);
+			} 
+			else
+			{
+				Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "(%d): ---- %s [%d clock ticks, %2.1f seconds]"
+					, m_line, m_pFunc, durationTick, durationSec);
+			}
 		}
 		else
 		{
-			//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s [%d clock ticks, %2.1f seconds]"
-			//	, m_pFuncFileName, m_pFunc, durationTick, durationSec);
-			//Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s [%d clock ticks, %2.1f seconds]"
-			//	, m_pFuncFileName, m_pFunc, durationTick, durationSec);
-			Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s [%d clock ticks, %2.1f seconds]"
-				, m_pFuncFileName, m_pFunc, durationTick, durationSec);
+			if (m_pFuncFileName)
+			{
+				//CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s [%d clock ticks, %2.1f seconds]"
+				//	, m_pFuncFileName, m_pFunc, durationTick, durationSec);
+				//Tool::CMyMFCStudyLog::LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s [%d clock ticks, %2.1f seconds]"
+				//	, m_pFuncFileName, m_pFunc, durationTick, durationSec);
+				Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "%s: ---- %s [%d clock ticks, %2.1f seconds]"
+					, m_pFuncFileName, m_pFunc, durationTick, durationSec);
+			} 
+			else
+			{
+				Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(m_pLogFile, "---- %s [%d clock ticks, %2.1f seconds]"
+					, m_pFunc, durationTick, durationSec);
+			}
 		}
 		// 该类使用 Tool::CMyMFCStudyLog ，可以考虑？？？在析构函数中对 Tool::CMyMFCStudyLog 的内部资源需要手动进行释放，避免泄漏。
 		//Tool::CMyMFCStudyLog::FREE();

@@ -143,6 +143,8 @@ namespace Tool // namespace Tool
 	public:
 		CMyAutoLogName(const char *file, int line, const char *func, const char *logFie);
 		CMyAutoLogName(const char *file, const char *func, const char *logFie);
+		// 提供一个简版的仅记录函数名称信息的接口
+		CMyAutoLogName(const char *func, const char *logFie);
 		~CMyAutoLogName();
 
 	private:
@@ -178,6 +180,8 @@ namespace Tool // namespace Tool
 //#define TOOL_AUTO_LOG_FUNCTION_INFO() Tool::CMyAutoLogName __myAutoLog(__FILE__, __FUNCTION__, "temp.log")
 // 为保证在增加互斥锁之前的旧代码可不更改即可运行，在调用之前进行互斥锁的初始化。 问题，但没有合适的地方进行自动释放删除？ 
 #define TOOL_AUTO_LOG_FUNCTION_INFO() Tool::CMyMFCStudyLog::INIT_MFC_STUDY_LOG_CRITICAL_SECTION(); Tool::CMyAutoLogName __myAutoLog(__FILE__, __FUNCSIG__, "temp.log")
+// 提供一个简版的记录函数名称信息的接口。
+#define TOOL_AUTO_LOG_FUNCTION_INFO_NO_FILE() Tool::CMyMFCStudyLog::INIT_MFC_STUDY_LOG_CRITICAL_SECTION(); Tool::CMyAutoLogName __myAutoLog(__FUNCTION__, "temp.log")
 
 
 //////////////////////////////////////////////////////////////////////////////////////////////////////
