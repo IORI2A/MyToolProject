@@ -155,6 +155,11 @@ namespace Tool // namespace Tool
 		char * m_pFunc;
 		char * m_pLogFile;
 
+		// 当文件名、函数名等过长时，空间不够用，会有堆异常写报错。
+		static const unsigned int m_pFuncFileNameLen;
+		static const unsigned int m_pFuncLen;
+		static const unsigned int m_pLogFileLen;
+
 		// 记录对象生命期 （ 转换为时钟数及分钟数 ）
 		clock_t m_startClock;
 		clock_t m_finishClock;

@@ -707,15 +707,20 @@ namespace Tool
 	//	CTool::FUN_LOG_TO_SPECIFIC_FILE_FORMAT_STR_ENDL(m_logFile.c_str(), "%s(%d): ++++ %s", m_file.c_str(), m_line, m_func.c_str());
 	//}
 
+	// 当文件名、函数名等过长时，空间不够用，会有堆异常写报错。
+	const unsigned int CMyAutoLogName::m_pFuncFileNameLen = 256;
+	const unsigned int CMyAutoLogName::m_pFuncLen = 512;
+	const unsigned int CMyAutoLogName::m_pLogFileLen = 128;
+
 	CMyAutoLogName::CMyAutoLogName(const char *funcFileName, int funcLine, const char *func, const char *logFie)
 		: m_pFuncFileName(NULL), m_line(funcLine), m_pFunc(NULL), m_pLogFile(NULL)
 		  , m_startClock(0), m_finishClock(0)
 	{
 		m_startClock = clock();  // 记录开始时的时钟
 
-		m_pFuncFileName = new char[128]();
-		m_pFunc = new char[128]();
-		m_pLogFile = new char[128]();
+		m_pFuncFileName = new char[m_pFuncFileNameLen]();
+		m_pFunc = new char[m_pFuncLen]();
+		m_pLogFile = new char[m_pLogFileLen]();
 
 		strcpy(m_pFuncFileName, funcFileName);
 		strcpy(m_pFunc, func);
@@ -742,10 +747,10 @@ namespace Tool
 	{
 		m_startClock = clock();  // 记录开始时的时钟
 
-		m_pFuncFileName = new char[128]();
+		m_pFuncFileName = new char[m_pFuncFileNameLen]();
 		//m_pFunc = new char[128](); 出现函数名过长时，空间不够用
-		m_pFunc = new char[512]();
-		m_pLogFile = new char[128]();
+		m_pFunc = new char[m_pFuncLen]();
+		m_pLogFile = new char[m_pLogFileLen]();
 
 		strcpy(m_pFuncFileName, file);
 		strcpy(m_pFunc, func);
@@ -806,9 +811,21 @@ namespace Tool
 		// 该类使用 Tool::CMyMFCStudyLog ，可以考虑？？？在析构函数中对 Tool::CMyMFCStudyLog 的内部资源需要手动进行释放，避免泄漏。
 		//Tool::CMyMFCStudyLog::FREE();
 
-		delete [] m_pFuncFileName;
-		delete [] m_pFunc;
-		delete [] m_pLogFile;
+		if (m_pFuncFileName)
+		{
+			delete [] m_pFuncFileName;
+			m_pFuncFileName = NULL;
+		}
+		if (m_pFunc)
+		{
+			delete [] m_pFunc;
+			m_pFunc = NULL;
+		}
+		if (m_pLogFile)
+		{
+			delete [] m_pLogFile;
+			m_pLogFile = NULL;
+		}
 	}
 }
 
