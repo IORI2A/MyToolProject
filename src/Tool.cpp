@@ -216,7 +216,15 @@ void CMyLog::LogEndl(const wchar_t *file, const wchar_t *str)
 {
 	EnterCriticalSection(&m_myLogCriticalSection);
 
+	// 出现该函数输出 wchar_t 中文时为 ？
+	// MSDN : Encodings Used Based on Flag and BOM
+#ifdef  UNICODE 
+	//FILE *f = _wfopen(file, L"a,ccs=UNICODE"); // 还是输出 ？。创建的文本编码为 UTF-8
+	FILE *f = _wfopen(file, L"a, ccs=UTF-8");
+#else
 	FILE *f = _wfopen(file, L"a");
+#endif
+	
 	fwprintf(f, L"%s%s\n", CTool::GET_CURRENT_TIME(L"%Y-%m-%d %H:%M:%S "), str);
 	fclose(f);
 
@@ -1417,3 +1425,126 @@ void Tool::CMyMFCStudyLog::FORCE_LOG_TO_FILE_FORMAT_STR_ENDL(const char *file, c
 	LeaveCriticalSection(&m_mfcStudyLogCriticalSection);
 }
 #pragma warning(default: 4996)
+
+
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+// error C3861: “wmemset”: 找不到标识符
+// error C3861: “wmemcpy”: 找不到标识符
+//#include <wchar.h>
+// error C3861: “_tcslen”: 找不到标识符
+#include <TCHAR.H>
+// error C3861: “StringCchPrintf”: 找不到标识符
+#include <strsafe.h>
+
+// windows的函数调用失败后，会产生一个系统错误（原因）码。可通过该错误码获取到对应的错误描述信息。
+// 以字符串返回，同时返回错误码
+//#include "Windows.h"
+
+/**************** 以字符串返回，同时返回错误码 支持ASNI 和 UNICODE ***************/
+DWORD Tool::GetLastErrorCodeAndText(LPVOID lpText, DWORD nSize)
+{
+	// Retrieve the system error message for the last-error code
+	DWORD dw = GetLastError(); 
+	LPVOID lpMsgBuf;
+	// DWORD WINAPI FormatMessage(__in DWORD dwFlags, __in LPCVOID lpSource, __in DWORD dwMessageId, __in DWORD dwLanguageId, __out LPTSTR lpBuffer, __in DWORD nSize, __in va_list* Arguments);
+	FormatMessage( // 用于根据错误码获取相应的错误文本信息。
+		FORMAT_MESSAGE_ALLOCATE_BUFFER |  // 函数内部分配缓冲区（大小：nSize，地址：lpBuffer）。不再使用时，调用LocalFree释放该缓冲区。
+		FORMAT_MESSAGE_FROM_SYSTEM |  //  根据系统错误码（system-defined error，GetLastError）搜索系统消息表(system message-table），获取相应的错误文本信息。
+		FORMAT_MESSAGE_IGNORE_INSERTS, //  Arguments参数被忽略。保持原始文本输出。
+		NULL, // 指定消息文本来源位置（本例从系统消息表中获取system message-table）。dwFlags 未指定 FORMAT_MESSAGE_FROM_HMODULE、FORMAT_MESSAGE_FROM_STRING 中任何一个时，该参数忽略。
+		dw, // dwFlags 包括 FORMAT_MESSAGE_FROM_STRING 时，该参数忽略
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT), // dwFlags 包括 FORMAT_MESSAGE_FROM_STRING 时，该参数忽略。
+		(LPTSTR) &lpMsgBuf, // 获取文本信息（null-terminated）（<= 64K bytes）
+		0, // 指定缓冲区的大小。如果 dwFlags 指定有 FORMAT_MESSAGE_ALLOCATE_BUFFER，则指定的是函数内部分配时的最小缓冲区大小。（缓冲区最大不超过 64K bytes）
+		NULL // 类似与 C 中 printf 函数的最后一个参数。
+		);
+
+	// 返回错误文本信息。
+#ifdef  UNICODE 
+	wmemset((LPTSTR)lpText, 0, nSize);
+#else
+	memset(lpText, 0, nSize);
+#endif
+
+	//size_t len = strlen((const char *)lpMsgBuf); // ?? 取的字节长度，是否正确？当是宽字符时会出现什么情况 ？ 如何获取缓冲区的字节长度？
+	size_t len = _tcslen((LPTSTR)lpMsgBuf); 
+	if (len >= nSize)  // 用户指定的内存放不下所有文本信息时，截掉多余文本。
+	{
+		len = nSize-1; 
+	}
+
+#ifdef  UNICODE 
+	wmemcpy((LPTSTR)lpText, (LPTSTR)lpMsgBuf, len); 
+#else
+	memcpy(lpText, lpMsgBuf, len); 
+#endif	
+
+	LocalFree(lpMsgBuf); // 释放系统分配的缓冲区。
+	// 同时返回错误代码
+	return dw;  
+}
+// 消息框 显示
+/**************** Error 消息框  ***************/
+void Tool::ErrorCodeOfFunctionDisplayOnMessageBox(LPTSTR lpszFunction) 
+{ 
+	// Retrieve the system error message for the last-error code
+	LPVOID lpMsgBuf;
+	LPVOID lpDisplayBuf;
+	DWORD dw = GetLastError(); 
+
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+		FORMAT_MESSAGE_FROM_SYSTEM |
+		FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL,
+		dw,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR) &lpMsgBuf,
+		0, NULL );
+
+	// Display the error message and exit the process
+	lpDisplayBuf = (LPVOID)LocalAlloc(LMEM_ZEROINIT, 
+		(lstrlen((LPCTSTR)lpMsgBuf)+lstrlen((LPCTSTR)lpszFunction)+40)*sizeof(TCHAR)); 
+	StringCchPrintf((LPTSTR)lpDisplayBuf, 
+		LocalSize(lpDisplayBuf),
+		TEXT("%s failed with error %d: %s"), 
+		lpszFunction, dw, lpMsgBuf); 
+	MessageBox(NULL, (LPCTSTR)lpDisplayBuf, TEXT("Error"), MB_OK); 
+
+	LocalFree(lpMsgBuf);
+	LocalFree(lpDisplayBuf);
+	//ExitProcess(dw); 
+}
+
+/**************** *********************  ***************/
+//void Tool::ErrorExit(LPTSTR lpszFunction) 
+//{ 
+//	ErrorCodeOfFunctionDisplayOnMessageBox(lpszFunction);
+//	ExitProcess(dw); 
+//}
+// 控制台 输出
+/**************** Error handling 控制台 ***************/
+void Tool::DispalyErrorInfor(LPTSTR lpszFunction) 
+{
+	// Retrieve the system error message for the last-error code
+	DWORD dw = GetLastError(); 
+	LPVOID lpMsgBuf;
+	FormatMessage(
+		FORMAT_MESSAGE_ALLOCATE_BUFFER | 
+		FORMAT_MESSAGE_FROM_SYSTEM |
+		FORMAT_MESSAGE_IGNORE_INSERTS,
+		NULL,
+		dw,
+		MAKELANGID(LANG_NEUTRAL, SUBLANG_DEFAULT),
+		(LPTSTR) &lpMsgBuf,
+		0, NULL );
+
+	// Display the error message
+	printf("%s failed with error %d: %s", lpszFunction, dw, (LPTSTR)lpMsgBuf);
+	LocalFree(lpMsgBuf);
+
+	/*****************************************************/
+	//errno = GetLastError(); 
+	//perror(lpszFunction);
+	//errno = 0;
+}

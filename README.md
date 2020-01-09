@@ -1,3 +1,13 @@
+**2020-01-09 P1**
+1. Tool 工具中增加获取windows的函数调用失败后，产生的系统错误（原因）码。可通过该错误码获取到对应的错误描述信息。
+- 以字符串返回，同时返回错误码 支持ASNI 和 UNICODE 。DWORD GetLastErrorCodeAndText(LPVOID lpText, DWORD nSize);
+- Error 消息框 显示。 void ErrorCodeOfFunctionDisplayOnMessageBox(LPTSTR lpszFunction);
+- Error handling 控制台 输出。 void DispalyErrorInfor(LPTSTR lpszFunction);
+2. 修复 BUG ，CMyLog::LogEndl 出现该输出 wchar_t 中文时为 ？ 串。
+- MSDN : Encodings Used Based on Flag and BOM
+- 优化该函数，在 _wfopen 创建文件时同时指定编码方式。
+
+
 **2020-01-08 P2**
 1. 提供一个简版的仅记录函数名称信息的接口 TOOL_AUTO_LOG_FUNCTION_INFO_NO_FILE() 。
 - CMyAutoLogName 同步实现一个简版的构造函数。

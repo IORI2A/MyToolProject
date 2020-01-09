@@ -320,5 +320,22 @@ namespace Tool // namespace Tool
 
 } // namespace Tool
 
+//////////////////////////////////////////////////////////////////////////////////////////////////////
+namespace Tool // namespace Tool
+{
+	// windows的函数调用失败后，会产生一个系统错误（原因）码。可通过该错误码获取到对应的错误描述信息。
+	// 以字符串返回，同时返回错误码
+	/**************** 以字符串返回，同时返回错误码 支持ASNI 和 UNICODE ***************/
+	DWORD GetLastErrorCodeAndText(LPVOID lpText, DWORD nSize);
+	// 消息框 显示
+	/**************** Error 消息框  ***************/
+	void ErrorCodeOfFunctionDisplayOnMessageBox(LPTSTR lpszFunction);
+	/**************** *********************  ***************/
+	//void ErrorExit(LPTSTR lpszFunction);
+	// 控制台 输出
+	/**************** Error handling 控制台 ***************/
+	void DispalyErrorInfor(LPTSTR lpszFunction);
+} // namespace Tool
+
 
 #endif /*__TOOL_H__*/
