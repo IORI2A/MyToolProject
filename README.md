@@ -1,3 +1,14 @@
+
+
+
+**2020-01-17 P1**
+1. 学习了解WINDWOS实现调用打印机进行打印的工程 windows_printer_study 。
+- 新建一个 vs2008 对话框程序 SimplePrint 进行学习开发、调测。
+- WIN32 方式，通过使用 PRINTDLG 和 PrintDlg 显示打印对话框。
+- 不使用界面交互（打印对话框）。 想实现后台隐藏打印。 使用 CreateDC 来创建打印机的 DC 进行输出打印。
+
+
+
 **2020-01-09 P1**
 1. Tool 工具中增加获取windows的函数调用失败后，产生的系统错误（原因）码。可通过该错误码获取到对应的错误描述信息。
 - 以字符串返回，同时返回错误码 支持ASNI 和 UNICODE 。DWORD GetLastErrorCodeAndText(LPVOID lpText, DWORD nSize);
